@@ -1,0 +1,101 @@
+pair = "EURGBP"
+pip = 0.0001
+seed = 7
+
+[fair_value]
+window = 504
+min_observations = 252
+ridge_alpha = 1.0
+embargo = 1
+min_r2 = 0.25
+stability_window = 60
+max_coef_instability = 1.5
+min_abs_coefficient = 0.001
+residual_z_lookback = 252
+min_residual_history = 60
+
+[forward]
+horizons = [1, 5, 20]
+embargo = 1
+fold_test_days = 63
+min_observations = 252
+
+[costs]
+simulated_spread_pips = 1.2
+slippage_pips = 0.3
+fee_pips = 0.1
+latency_cost_pips = 0.05
+
+[delays]
+data_delay_seconds = 0
+processing_delay_seconds = 0
+signal_delay_seconds = 0
+execution_delay_seconds = 0
+
+[alpha]
+ic_horizon = 5
+active_ic = 0.03
+decaying_long_ic = 0.05
+short_to_long_ratio = 0.25
+mid_to_long_ratio = 0.6
+min_tradable_lag_minutes = 10.0
+lag_compression_ratio = 4.0
+
+[opportunity]
+min_mispricing_pips = 12.0
+min_net_edge_pips = 1.0
+max_crowding = 0.85
+chase_fraction = 0.6
+fundamental_conflict = 0.35
+prior_convergence_probability = 0.55
+min_hit_rate_sample = 30
+residual_z_entry = 1.5
+event_confirmation_days = 1.0
+
+[entry]
+pullback_retrace = 0.3
+recent_lookback = 5
+
+[exit]
+close_pips = 8.0
+stop_pips = 40.0
+max_hold_multiple = 2.0
+expected_hold_days = 8.0
+convergence_fraction = 0.3
+rate_invalidation = 0.25
+policy_invalidation = 0.15
+growth_invalidation = 0.75
+inflation_invalidation = 0.75
+risk_invalidation = 0.15
+momentum_invalidation = 0.01
+
+[risk]
+target_annual_vol = 0.08
+max_position = 1.0
+max_pair_exposure = 1.0
+max_daily_loss = 0.02
+max_drawdown = 0.10
+risk_budget = 0.02
+
+[fundamental]
+rate = 0.30
+policy = 0.25
+growth = 0.20
+inflation = 0.15
+risk = 0.10
+
+[score]
+fundamental_edge = 0.20
+mispricing = 0.25
+regime = 0.15
+alpha = 0.15
+positioning = 0.10
+cost = 0.10
+execution = 0.05
+
+[features]
+surprise_min_history = 8
+macro_stale_days = 90
+rate_stale_days = 5
+market_stale_days = 3
+info_half_life_days = 60.0
