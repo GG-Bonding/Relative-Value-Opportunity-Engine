@@ -28,6 +28,7 @@ Phases follow the spec. Status is against this repository, not against a live EU
 | 22 | Post-trade attribution and review labels | Done |
 | 23 | Champion / challenger gate | Gate is implemented. No challenger is promoted |
 | 24 | Paper trading | The event-driven book, labeled `PAPER`. No broker |
+| 24.5 | Live forward research | Shadow, paper, and an unarmed MT5-shaped book. Jin10 is information. No live order |
 | 25 | Kalman, dynamic beta, online updating | Not implemented |
 | 26 | AUDNZD, gold/silver, Brent/WTI, NVDA/AMD | Not implemented |
 
@@ -39,6 +40,10 @@ Kalman would answer "which beta is moving inside the window" more smoothly than 
 
 Another pair needs the same revision-safe data and a separate mechanism registry. EURGBP does not yet have a vendor-data result. The code rejects any other symbol.
 
+## Phase 24.5
+
+The laboratory backtest stays the machinery test. It is not a claim about live EURGBP. From the first forward run, each call is appended and left as it was. Later ticks append a new journal row for convergence, a closed gap, or a thesis break. Jin10 calendars, flashes, and headlines are stored as information. EURGBP bid and ask come from an MT5 tick file. UK2Y and DE2Y come from a separate rate file. A missing rate is not stored as zero. `rv forward --mode live` records the same signal and does not send an order.
+
 ## Still outside V1
 
-A real OIS history, consensus vintages, CFTC, and an executable FX book. Until those exist, the market conclusion in the research report stays `INCONCLUSIVE`.
+A real OIS history, consensus vintages, and CFTC. The forward path can record an MT5 book and a rate file. It does not by itself change the research report. Until that forward sample has been scored, the market conclusion stays `INCONCLUSIVE`.

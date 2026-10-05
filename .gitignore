@@ -11,3 +11,4 @@ build/
 *.duckdb
 artifacts/runs/
 .DS_Store
+.env

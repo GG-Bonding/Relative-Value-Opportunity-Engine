@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
 from api.service import EngineService
 from data.laboratory import build_laboratory
 from data.store import PitStore
-from domain.config import load_config
+from domain.config import EngineConfig, load_config
 from domain.errors import UnsupportedPairError
 from domain.models import require_eurgbp
 from evaluation.report import write_v1_report
@@ -25,6 +26,7 @@ def main(argv: list[str] | None = None) -> int:
 
     ingest = sub.add_parser("ingest")
     ingest.add_argument("--laboratory", action="store_true")
+    ingest.add_argument("--jin10", action="store_true")
 
     sub.add_parser("validate-data")
     for name in (
@@ -46,28 +48,61 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("replay")
     sub.add_parser("experiments")
     sub.add_parser("compare-models")
-    report = sub.add_parser("research-report")
-    report.add_argument("--output", default="artifacts/v1-research-report.md")
+    report_command = sub.add_parser("research-report")
+    report_command.add_argument("--output", default="artifacts/v1-research-report.md")
+    forward = sub.add_parser("forward")
+    forward.add_argument("--mode", choices=["shadow", "paper", "live"], required=True)
+    forward.add_argument("--tick", required=True)
+    forward.add_argument("--rates", required=True)
+    forward.add_argument("--events")
+    forward.add_argument("--fair-value", dest="fair_value", type=float)
 
     args = parser.parse_args(argv)
     if args.command == "mechanisms":
         return _mechanisms(args.pair)
     config = load_config(Path(args.config))
     if args.command == "ingest":
-        if not args.laboratory:
-            print("V1 ingest accepts --laboratory. Vendor PIT history is not bundled.", file=sys.stderr)
+        if args.laboratory and args.jin10:
+            print("choose one ingest source: --laboratory or --jin10", file=sys.stderr)
+            return 2
+        if not args.laboratory and not args.jin10:
+            print("V1 ingest accepts --laboratory or --jin10.", file=sys.stderr)
             return 2
         path = Path(args.db)
         path.parent.mkdir(parents=True, exist_ok=True)
         store = PitStore(path)
-        build_laboratory(store, config)
-        print(json.dumps({"db": str(path), "rows": store.count("market_observations")}))
-        store.close()
+        try:
+            if args.laboratory:
+                build_laboratory(store, config)
+                print(json.dumps({"db": str(path), "rows": store.count("market_observations")}))
+            else:
+                _load_local_env()
+                from data.jin10_client import Jin10Client, Jin10Error, mcp_url_from_env, token_from_env
+                from data.jin10_ingest import ingest_jin10
+
+                try:
+                    client = Jin10Client(token_from_env(), mcp_url_from_env())
+                except Jin10Error as exc:
+                    print(str(exc), file=sys.stderr)
+                    return 2
+                try:
+                    report = ingest_jin10(store, client)
+                except Jin10Error as exc:
+                    print(str(exc), file=sys.stderr)
+                    return 2
+                finally:
+                    client.close()
+                report["db"] = str(path)
+                print(json.dumps(report, ensure_ascii=False))
+        finally:
+            store.close()
         return 0
     if args.command == "research-report":
         write_v1_report(Path(args.db), Path(args.output), config)
         print(args.output)
         return 0
+    if args.command == "forward":
+        return _forward(args, config)
     if not Path(args.db).exists():
         print(f"no store at {args.db}. Run rv ingest --laboratory first.", file=sys.stderr)
         return 2
@@ -77,6 +112,56 @@ def main(argv: list[str] | None = None) -> int:
         return _dispatch(service, args)
     finally:
         store.close()
+
+
+def _forward(args: argparse.Namespace, config: EngineConfig) -> int:
+    from datetime import datetime
+
+    from domain.errors import DataValidationError, PointInTimeError
+    from domain.timeutil import UTC
+    from forward.cycle import ForwardBook, run_forward
+    from forward.events import load_events
+    from forward.mt5 import load_mt5_tick
+    from forward.rates import load_rates
+
+    path = Path(args.db)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        tick = load_mt5_tick(args.tick)
+        rates = load_rates(args.rates)
+        events = load_events(args.events) if args.events else []
+        store = PitStore(path)
+        try:
+            result = run_forward(
+                store,
+                config,
+                args.mode,
+                ForwardBook(tick=tick, rates=rates, events=events),
+                ingested_at=datetime.now(tz=UTC),
+                fair_value=args.fair_value,
+            )
+        finally:
+            store.close()
+    except (DataValidationError, PointInTimeError, OSError, json.JSONDecodeError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    print(json.dumps(result, ensure_ascii=False))
+    if args.mode == "live":
+        return 2
+    return 0
+
+
+def _load_local_env() -> None:
+    """Fill missing Jin10 settings from a local .env. Existing variables win."""
+    path = Path(".env")
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
 def _flags_before_command(argv: list[str]) -> list[str]:

@@ -19,6 +19,8 @@ _NEXT: dict[OpportunityStatus, set[OpportunityStatus]] = {
     },
     OpportunityStatus.READY: {
         OpportunityStatus.ENTERED,
+        OpportunityStatus.CONVERGING,
+        OpportunityStatus.EXITED,
         OpportunityStatus.EXPIRED,
         OpportunityStatus.REJECTED,
         OpportunityStatus.INVALIDATED,
@@ -26,10 +28,12 @@ _NEXT: dict[OpportunityStatus, set[OpportunityStatus]] = {
     OpportunityStatus.ENTERED: {
         OpportunityStatus.CONVERGING,
         OpportunityStatus.EXIT_READY,
+        OpportunityStatus.EXITED,
         OpportunityStatus.INVALIDATED,
     },
     OpportunityStatus.CONVERGING: {
         OpportunityStatus.EXIT_READY,
+        OpportunityStatus.EXITED,
         OpportunityStatus.INVALIDATED,
         OpportunityStatus.ENTERED,
     },

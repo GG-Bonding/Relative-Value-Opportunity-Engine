@@ -176,6 +176,63 @@ TABLES: dict[str, str] = {
             UNIQUE(leg, metric, observed_at, source, version)
         )
     """,
+    "information_events": """
+        CREATE TABLE IF NOT EXISTS information_events (
+            record_id VARCHAR PRIMARY KEY,
+            event_id VARCHAR NOT NULL,
+            kind VARCHAR NOT NULL,
+            headline VARCHAR NOT NULL,
+            region VARCHAR,
+            category VARCHAR,
+            surprise DOUBLE,
+            pressure DOUBLE,
+            observed_at VARCHAR NOT NULL,
+            ingested_at VARCHAR NOT NULL,
+            source VARCHAR NOT NULL,
+            version VARCHAR NOT NULL,
+            UNIQUE(event_id, source, version)
+        )
+    """,
+    "opportunity_journal": """
+        CREATE TABLE IF NOT EXISTS opportunity_journal (
+            record_id VARCHAR PRIMARY KEY,
+            opportunity_id VARCHAR NOT NULL,
+            sequence INTEGER NOT NULL,
+            observed_at VARCHAR NOT NULL,
+            ingested_at VARCHAR NOT NULL,
+            mode VARCHAR NOT NULL,
+            status VARCHAR NOT NULL,
+            decision VARCHAR NOT NULL,
+            direction VARCHAR,
+            bid DOUBLE,
+            ask DOUBLE,
+            mid DOUBLE,
+            fair_value DOUBLE,
+            fill_price DOUBLE,
+            rate_diff DOUBLE,
+            model_readiness VARCHAR NOT NULL,
+            detail VARCHAR NOT NULL,
+            UNIQUE(opportunity_id, sequence),
+            UNIQUE(opportunity_id, observed_at)
+        )
+    """,
+    "forward_decisions": """
+        CREATE TABLE IF NOT EXISTS forward_decisions (
+            record_id VARCHAR PRIMARY KEY,
+            mode VARCHAR NOT NULL,
+            observed_at VARCHAR NOT NULL,
+            ingested_at VARCHAR NOT NULL,
+            decision VARCHAR NOT NULL,
+            direction VARCHAR,
+            model_readiness VARCHAR NOT NULL,
+            bid DOUBLE,
+            ask DOUBLE,
+            rate_diff DOUBLE,
+            fair_value DOUBLE,
+            detail VARCHAR NOT NULL,
+            UNIQUE(mode, observed_at)
+        )
+    """,
 }
 
 KEY_FIELDS: dict[str, list[str]] = {
@@ -188,6 +245,9 @@ KEY_FIELDS: dict[str, list[str]] = {
     "option_observations": ["pair", "observed_at", "source", "version"],
     "commodity_observations": ["instrument", "observed_at", "source", "version"],
     "risk_observations": ["leg", "metric", "observed_at", "source", "version"],
+    "information_events": ["event_id", "source", "version"],
+    "opportunity_journal": ["opportunity_id", "sequence"],
+    "forward_decisions": ["mode", "observed_at"],
 }
 
 RATE_CURVES = frozenset(
@@ -242,6 +302,20 @@ class PitStore:
 
     def append_risk(self, obs: RiskObservation) -> str:
         return self._insert("risk_observations", obs)
+
+    def rows(self, table: str) -> list[dict[str, Any]]:
+        self._check_table(table)
+        frame = self._conn.execute(f"SELECT * FROM {table} ORDER BY observed_at, record_id").pl()
+        if frame.is_empty():
+            return []
+        return frame.to_dicts()
+
+    def has_forward_decision(self, mode: str, observed_at: datetime) -> bool:
+        row = self._conn.execute(
+            "SELECT 1 FROM forward_decisions WHERE mode = ? AND observed_at = ? LIMIT 1",
+            [mode, dump_ts(ensure_utc(observed_at))],
+        ).fetchone()
+        return row is not None
 
     def history(self, table: str, as_of: datetime) -> pl.DataFrame:
         self._check_table(table)

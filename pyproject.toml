@@ -73,6 +73,7 @@ packages = [
     "backtest",
     "evaluation",
     "api",
+    "forward",
 ]
 disallow_untyped_defs = true
 warn_unused_ignores = true

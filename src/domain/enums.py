@@ -117,3 +117,17 @@ class FillSide(StrEnum):
 class SpreadSource(StrEnum):
     OBSERVED_BOOK = "OBSERVED_BOOK"
     SIMULATED_SPREAD = "SIMULATED_SPREAD"
+
+
+class ExecutionMode(StrEnum):
+    """Shadow records the call. Paper fills the broker book. Live is the same call with an order."""
+
+    SHADOW = "SHADOW"
+    PAPER = "PAPER"
+    LIVE = "LIVE"
+
+
+class ModelReadiness(StrEnum):
+    NOT_READY = "MODEL_NOT_READY"
+    LOW = "LOW"
+    READY = "READY"
