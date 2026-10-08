@@ -6,7 +6,6 @@ import math
 from datetime import datetime
 from typing import Any
 
-from data.policy_news import policy_pressure
 from domain.errors import PointInTimeError
 from domain.hashing import stable_id
 from domain.timeutil import dump_ts, ensure_utc
@@ -33,7 +32,11 @@ def relative_pressure(
     surprise: float | None,
     headline: str = "",
 ) -> float | None:
-    """Positive pressure means EUR is relatively stronger. Missing surprise stays missing."""
+    """Positive pressure means EUR is relatively stronger.
+
+    `surprise` is a z-score against that indicator's own history. A raw
+    actual-minus-forecast is not a pressure. Missing history stays missing.
+    """
     if region is None or category is None or surprise is None:
         return None
     if not math.isfinite(surprise) or surprise == 0:
@@ -49,7 +52,7 @@ def relative_pressure(
         return None
     if category == "EMPLOYMENT" and "失业" in headline:
         leg *= -1.0
-    scaled = max(-1.0, min(1.0, surprise / 3.0))
+    scaled = max(-1.0, min(1.0, surprise))
     return leg * scaled
 
 
@@ -59,18 +62,8 @@ def event_contribution(
     surprise: float | None,
     headline: str = "",
 ) -> float | None:
-    """Macro surprise plus a policy headline. Each missing piece stays missing."""
-    parts = [
-        value
-        for value in (
-            relative_pressure(region, category, surprise, headline),
-            policy_pressure(headline),
-        )
-        if value is not None
-    ]
-    if not parts:
-        return None
-    return max(-1.0, min(1.0, sum(parts)))
+    """Macro z-score only. A policy headline does not add a signed factor."""
+    return relative_pressure(region, category, surprise, headline)
 
 
 def event_narrative(region: str | None, category: str | None, surprise: float | None, headline: str = "") -> str | None:
@@ -97,6 +90,7 @@ def information_event(
     region: str | None = None,
     category: str | None = None,
     surprise: float | None = None,
+    raw_surprise: float | None = None,
 ) -> dict[str, Any]:
     observed = ensure_utc(observed_at)
     ingested = ensure_utc(ingested_at)
@@ -109,6 +103,7 @@ def information_event(
         "region": region,
         "category": category,
         "surprise": surprise,
+        "raw_surprise": raw_surprise,
         "pressure": event_contribution(region, category, surprise, headline),
         "observed_at": dump_ts(observed),
         "ingested_at": dump_ts(ingested),

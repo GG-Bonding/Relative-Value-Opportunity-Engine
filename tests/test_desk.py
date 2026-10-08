@@ -16,6 +16,9 @@ def test_empty_log_has_no_latest_call(tmp_path: Path) -> None:
     assert body["pair"] == "EURGBP"
     assert body["count"] == 0
     assert body["latest"] is None
+    assert body["alpha"]["lifecycle"] == "DISCOVERY"
+    assert body["alpha"]["n_samples"] == 0
+    assert body["alpha"]["hit_rate"] is None
 
 
 def test_desk_shows_the_newest_call_and_skips_a_broken_line(tmp_path: Path) -> None:
@@ -35,9 +38,41 @@ def test_desk_shows_the_newest_call_and_skips_a_broken_line(tmp_path: Path) -> N
     page = TestClient(create_desk_app(log)).get("/")
     assert page.status_code == 200
     assert "相对价值监控" in page.text
+    assert "Alpha 证据" in page.text
     assert "/v1/desk" in page.text
     served = TestClient(create_desk_app(log)).get("/v1/desk").json()
     assert served["latest"]["rates"]["rate_diff"] == 1.39
+
+
+def test_desk_reads_saved_alpha_evidence(tmp_path: Path) -> None:
+    log = tmp_path / "rounds.jsonl"
+    log.write_text("", encoding="utf-8")
+    (tmp_path / "alpha.jsonl").write_text(
+        json.dumps(
+            {
+                "lifecycle": "VALIDATING",
+                "n_samples": 80,
+                "hit_rate": 0.55,
+                "convergence_rate": 0.4,
+                "after_cost_pnl": 12.5,
+                "ic_21": 0.03,
+                "ic_63": 0.02,
+                "ic_252": None,
+                "reasons": ["trailing sample is shorter than 252 realized outcomes"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    alpha = read_desk(log)["alpha"]
+    assert alpha["lifecycle"] == "VALIDATING"
+    assert alpha["n_samples"] == 80
+    assert alpha["hit_rate"] == 0.55
+    assert alpha["convergence_rate"] == 0.4
+    assert alpha["after_cost_pnl"] == 12.5
+    assert alpha["ic_21"] == 0.03
+    assert alpha["ic_63"] == 0.02
+    assert alpha["ic_252"] is None
 
 
 def test_desk_command_binds_the_local_page(tmp_path: Path, monkeypatch) -> None:

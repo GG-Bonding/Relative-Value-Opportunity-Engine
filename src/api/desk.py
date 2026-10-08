@@ -40,6 +40,35 @@ def read_desk(path: str | Path, *, limit: int = 40) -> dict[str, Any]:
         "latest": history[0] if history else None,
         "history": history,
         "last_order": _last_order(Path(path)),
+        "alpha": _alpha(Path(path)),
+    }
+
+
+def _alpha(path: Path) -> dict[str, Any]:
+    rows = _rows(path.with_name("alpha.jsonl"))
+    if not rows:
+        return {
+            "lifecycle": "DISCOVERY",
+            "n_samples": 0,
+            "hit_rate": None,
+            "convergence_rate": None,
+            "after_cost_pnl": None,
+            "ic_21": None,
+            "ic_63": None,
+            "ic_252": None,
+            "reasons": ["too few realized outcomes to validate"],
+        }
+    latest = rows[-1]
+    return {
+        "lifecycle": latest.get("lifecycle") or "DISCOVERY",
+        "n_samples": int(latest.get("n_samples") or 0),
+        "hit_rate": _number(latest.get("hit_rate")),
+        "convergence_rate": _number(latest.get("convergence_rate")),
+        "after_cost_pnl": _number(latest.get("after_cost_pnl")),
+        "ic_21": _number(latest.get("ic_21")),
+        "ic_63": _number(latest.get("ic_63")),
+        "ic_252": _number(latest.get("ic_252")),
+        "reasons": _strings(latest.get("reasons")),
     }
 
 
@@ -127,11 +156,7 @@ def _headlines(raw: Any) -> list[dict[str, Any]]:
     prints = [item for item in raw if isinstance(item, dict) and isinstance(item.get("headline"), str)]
     carrying = [item for item in prints if _number(item.get("surprise")) not in {None, 0.0}]
     if not carrying:
-        carrying = [
-            item
-            for item in prints
-            if item.get("kind") == "CALENDAR" and item.get("country") in {"UK", "EZ"}
-        ]
+        carrying = [item for item in prints if item.get("kind") == "CALENDAR" and item.get("country") in {"UK", "EZ"}]
     if not carrying:
         carrying = [item for item in prints if item.get("kind") != "NEWS"]
     return [
@@ -251,6 +276,7 @@ DESK_PAGE = """<!DOCTYPE html>
     <p id="meta">正在读取记录</p>
   </header>
   <section class="call" id="call"></section>
+  <section class="panel" id="alpha"></section>
   <div class="grid">
     <section class="panel" id="book"></section>
     <section class="panel" id="rates"></section>
@@ -285,6 +311,7 @@ function render(body) {
     ? "共 " + body.count + " 次评估 · 最近 " + latest.ingested_at + " · 每 5 秒刷新 · 不下单"
     : "记录还是空的 · 每 5 秒刷新";
   drawCall(latest, body.last_order);
+  drawAlpha(body.alpha || {});
   drawBook(latest);
   drawRates(latest);
   drawChart(body.history);
@@ -314,6 +341,36 @@ function drawCall(latest, lastOrder) {
   if (lastOrder && lastOrder.live_order) {
     root.append(el("p", "最近订单 " + lastOrder.action + " · " + lastOrder.live_order));
   }
+}
+
+function pct(value) {
+  return value == null ? "—" : (Number(value) * 100).toFixed(1) + "%";
+}
+
+function drawAlpha(alpha) {
+  const root = document.getElementById("alpha");
+  root.replaceChildren(el("h2", "Alpha 证据"));
+  const grid = el("div");
+  grid.className = "figures";
+  const cells = [
+    ["状态", alpha.lifecycle || "DISCOVERY"],
+    ["一日样本", String(alpha.n_samples || 0)],
+    ["命中率", pct(alpha.hit_rate)],
+    ["收敛率", pct(alpha.convergence_rate)],
+    ["扣成本", alpha.after_cost_pnl == null ? "—" : plain(alpha.after_cost_pnl, 1) + " pip"],
+    ["IC 21", plain(alpha.ic_21, 3)],
+    ["IC 63", plain(alpha.ic_63, 3)],
+    ["IC 252", plain(alpha.ic_252, 3)]
+  ];
+  cells.forEach((pair) => {
+    const cell = el("div");
+    cell.append(el("span", pair[0]), el("b", pair[1]));
+    grid.append(cell);
+  });
+  root.append(grid);
+  const reason = alpha.reasons && alpha.reasons.length ? alpha.reasons[0] : "";
+  if (reason) root.append(el("p", reason));
+  root.append(el("p", "ACTIVE 之前，rv watch --mode live --trade 不会发送新开仓。"));
 }
 
 function drawBook(latest) {

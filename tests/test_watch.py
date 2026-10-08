@@ -112,6 +112,54 @@ def test_baseline_names_the_surprise_rather_than_every_headline(tmp_path: Path) 
     assert notices[0]["headlines"] == ["英国9月CPI年率"]
 
 
+def test_a_discovery_short_does_not_reach_the_trader(tmp_path: Path, monkeypatch) -> None:
+    calls: list[object] = []
+
+    def fake_round(*_args: object, **_kwargs: object) -> dict[str, object]:
+        return {
+            "mode": "LIVE",
+            "decision": "SHORT",
+            "direction": "SHORT",
+            "status": "READY",
+            "duplicate": False,
+            "reasons": ["research sample; alpha is not ACTIVE"],
+            "narratives": [],
+            "model_readiness": "LOW",
+            "alpha": "DISCOVERY",
+            "data_health": "HEALTHY",
+            "net_edge_pips": 20.0,
+            "executed": False,
+            "live_order": "not armed",
+            "inputs": {"fair_value": 0.85},
+        }
+
+    monkeypatch.setattr("forward.watch.run_round", fake_round)
+    notices: list[dict[str, object]] = []
+    store = PitStore(tmp_path / "gate.duckdb")
+    try:
+        watch_loop(
+            store,
+            EngineConfig(),
+            "live",
+            terminal=None,
+            fair_value=0.85,
+            log_path=tmp_path / "rounds.jsonl",
+            interval_seconds=60,
+            load_inputs=lambda moment, curves: _book([_flash("one")]),
+            sleep=lambda seconds: None,
+            clock=lambda: T0,
+            max_cycles=1,
+            emit=notices.append,
+            fetch_rates=lambda: ({}, {}, None),
+            trader=lambda decision, assessment: calls.append(decision) or {"order_sent": True, "live_order": "sent"},
+        )
+    finally:
+        store.close()
+    assert calls == []
+    assert notices[0]["order_sent"] is False
+    assert "ACTIVE" in str(notices[0]["live_order"])
+
+
 def test_watch_does_not_send_an_order_and_live_stays_resident(tmp_path: Path, monkeypatch) -> None:
     source = Path(__file__).resolve().parents[1].joinpath("src/forward/watch.py").read_text(encoding="utf-8")
     assert "order_send" not in source
@@ -123,9 +171,7 @@ def test_watch_does_not_send_an_order_and_live_stays_resident(tmp_path: Path, mo
         return 0
 
     monkeypatch.setattr("forward.watch.watch_loop", fake)
-    code = main(
-        ["--db", str(tmp_path / "watch.duckdb"), "--config", str(CONFIG), "watch", "--mode", "live"]
-    )
+    code = main(["--db", str(tmp_path / "watch.duckdb"), "--config", str(CONFIG), "watch", "--mode", "live"])
     assert code == 0
     assert seen["mode"] == "live"
     assert seen["interval"] == 60.0

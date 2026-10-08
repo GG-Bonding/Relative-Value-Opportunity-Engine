@@ -185,6 +185,7 @@ TABLES: dict[str, str] = {
             region VARCHAR,
             category VARCHAR,
             surprise DOUBLE,
+            raw_surprise DOUBLE,
             pressure DOUBLE,
             observed_at VARCHAR NOT NULL,
             ingested_at VARCHAR NOT NULL,
@@ -233,6 +234,40 @@ TABLES: dict[str, str] = {
             UNIQUE(mode, observed_at)
         )
     """,
+    "forward_outcomes": """
+        CREATE TABLE IF NOT EXISTS forward_outcomes (
+            record_id VARCHAR PRIMARY KEY,
+            opportunity_id VARCHAR NOT NULL,
+            horizon VARCHAR NOT NULL,
+            observed_at VARCHAR NOT NULL,
+            ingested_at VARCHAR NOT NULL,
+            direction VARCHAR NOT NULL,
+            gross_pips DOUBLE NOT NULL,
+            after_cost_pips DOUBLE NOT NULL,
+            gap_entry_pips DOUBLE NOT NULL,
+            gap_now_pips DOUBLE NOT NULL,
+            converged BOOLEAN NOT NULL,
+            hit BOOLEAN NOT NULL,
+            entry_observed_at VARCHAR NOT NULL,
+            UNIQUE(opportunity_id, horizon)
+        )
+    """,
+    "forward_alpha": """
+        CREATE TABLE IF NOT EXISTS forward_alpha (
+            record_id VARCHAR PRIMARY KEY,
+            observed_at VARCHAR NOT NULL,
+            lifecycle VARCHAR NOT NULL,
+            n_samples INTEGER NOT NULL,
+            hit_rate DOUBLE,
+            convergence_rate DOUBLE,
+            after_cost_pnl DOUBLE,
+            ic_21 DOUBLE,
+            ic_63 DOUBLE,
+            ic_252 DOUBLE,
+            reasons VARCHAR NOT NULL,
+            UNIQUE(observed_at)
+        )
+    """,
 }
 
 KEY_FIELDS: dict[str, list[str]] = {
@@ -248,6 +283,8 @@ KEY_FIELDS: dict[str, list[str]] = {
     "information_events": ["event_id", "source", "version"],
     "opportunity_journal": ["opportunity_id", "sequence"],
     "forward_decisions": ["mode", "observed_at"],
+    "forward_outcomes": ["opportunity_id", "horizon"],
+    "forward_alpha": ["observed_at"],
 }
 
 RATE_CURVES = frozenset(
@@ -270,6 +307,7 @@ class PitStore:
         self._conn = duckdb.connect(self.path)
         for statement in TABLES.values():
             self._conn.execute(statement)
+        self._conn.execute("ALTER TABLE information_events ADD COLUMN IF NOT EXISTS raw_surprise DOUBLE")
 
     def close(self) -> None:
         self._conn.close()

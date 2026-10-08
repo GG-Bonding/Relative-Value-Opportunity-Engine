@@ -12,6 +12,16 @@ import numpy as np
 import polars as pl
 
 
+def standardized_surprise(raw: float, prior_raw: list[float], min_history: int = 8) -> float | None:
+    """(actual - consensus) / sample std of earlier raw errors. A short history stays missing."""
+    if len(prior_raw) < min_history:
+        return None
+    std = float(np.std(np.asarray(prior_raw, dtype=float), ddof=1))
+    if not np.isfinite(std) or std < 1e-12 or not np.isfinite(raw):
+        return None
+    return float(raw / std)
+
+
 def with_surprise(releases: pl.DataFrame, min_history: int = 8) -> pl.DataFrame:
     if releases.is_empty():
         return releases.with_columns(

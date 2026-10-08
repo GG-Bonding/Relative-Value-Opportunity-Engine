@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from data.information import event_contribution, event_narrative, information_event
-from data.policy_news import policy_narrative
+from data.policy_news import policy_context
 from domain.errors import DataValidationError
 from forward.mt5 import parse_feed_time
 
@@ -23,6 +23,7 @@ class EventInput:
     category: str | None
     surprise: float | None
     observed_at: datetime | None
+    raw_surprise: float | None = None
 
 
 def load_events(path: str | Path) -> list[EventInput]:
@@ -58,7 +59,7 @@ def narratives_for(events: list[EventInput]) -> list[str]:
     lines: list[str] = []
     for event in events:
         line = event_narrative(event.region, event.category, event.surprise, event.headline)
-        policy = policy_narrative(event.headline)
+        policy = policy_context(event.headline)
         if line is not None:
             lines.append(line)
         if policy is not None:
@@ -96,6 +97,7 @@ def event_row(
         region=event.region,
         category=event.category,
         surprise=event.surprise,
+        raw_surprise=event.raw_surprise,
     )
 
 

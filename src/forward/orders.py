@@ -79,7 +79,10 @@ def align_eurgbp(
         for item in plan.close:
             sent.append(_send(mt5, _close_request(mt5, info, tick, item)))
         if plan.open_side is not None:
-            if volume is None:
+            blocked = _open_block(plan.open_side, sent, _held(mt5))
+            if blocked is not None:
+                sent.append(blocked)
+            elif volume is None:
                 sent.append({"ok": False, "side": plan.open_side, "error": "lots are below the broker minimum"})
             else:
                 sent.append(_send(mt5, _open_request(mt5, info, tick, plan.open_side, volume)))
@@ -97,6 +100,17 @@ def align_eurgbp(
         return report
     finally:
         mt5.shutdown()
+
+
+def _open_block(side: str, sent: list[dict[str, Any]], held: list[Held]) -> dict[str, Any] | None:
+    """Skip the new ticket unless every close succeeded and the book is flat on that side."""
+    if any(item.get("ok") is not True for item in sent):
+        return {"ok": False, "side": side, "error": "close failed; new side was not opened"}
+    if any(item.side != side for item in held):
+        return {"ok": False, "side": side, "error": "opposite position is still open"}
+    if any(item.side == side for item in held):
+        return {"ok": False, "side": side, "error": "already open"}
+    return None
 
 
 def _held(mt5: Any) -> list[Held]:

@@ -13,7 +13,7 @@ from typing import Any
 
 from data.store import PitStore
 from domain.config import EngineConfig
-from domain.enums import DecisionState, ExecutionMode, ModelReadiness
+from domain.enums import AlphaLifecycle, DecisionState, ExecutionMode, ModelReadiness
 from domain.errors import PointInTimeError
 from domain.timeutil import dump_ts, ensure_utc
 from forward.cycle import ForwardBook, _persist_events, _persist_rates, _skip, run_forward
@@ -23,6 +23,7 @@ from forward.mt5 import Mt5Tick
 from forward.official_rates import DE_SOURCE, UK_SOURCE
 from forward.prints import InformationPrint, as_events, print_payload, usable_prints
 from forward.rates import RateSnapshot
+from forward.standardize import standardize_events
 
 
 @dataclass(frozen=True)
@@ -44,11 +45,12 @@ def run_round(
     ingested_at: datetime,
     fair_value: float | None,
     log_path: str | Path,
+    alpha: AlphaLifecycle = AlphaLifecycle.DISCOVERY,
 ) -> dict[str, Any]:
     execution = mode if isinstance(mode, ExecutionMode) else ExecutionMode(str(mode).upper())
     ingested = ensure_utc(ingested_at)
     prints = usable_prints(inputs.prints, ingested)
-    events = as_events(prints)
+    events = standardize_events(store, as_events(prints), config)
     tick = inputs.tick
     if tick is not None and tick.time > ingested:
         ingested = tick.time
@@ -56,7 +58,7 @@ def run_round(
         outcome = _without_quote(store, execution, inputs.rates, events, ingested, fair_value)
     else:
         try:
-            outcome = _with_quote(store, config, execution, inputs.rates, events, tick, ingested, fair_value)
+            outcome = _with_quote(store, config, execution, inputs.rates, events, tick, ingested, fair_value, alpha)
         except PointInTimeError as exc:
             outcome = _stopped(
                 execution,
@@ -90,6 +92,7 @@ def _with_quote(
     tick: Mt5Tick,
     ingested: datetime,
     fair_value: float | None,
+    alpha: AlphaLifecycle,
 ) -> dict[str, Any]:
     result = run_forward(
         store,
@@ -98,6 +101,7 @@ def _with_quote(
         ForwardBook(tick=tick, rates=rates, events=events),
         ingested_at=ingested,
         fair_value=fair_value,
+        alpha=alpha,
     )
     if result.get("duplicate"):
         recorded = _duplicate(store, mode, tick, result)
@@ -260,6 +264,9 @@ def _payload(
         "model_readiness": outcome.get("model_readiness"),
         "event_pressure": outcome.get("event_pressure"),
         "narratives": outcome.get("narratives"),
+        "alpha": outcome.get("alpha"),
+        "net_edge_pips": outcome.get("net_edge_pips"),
+        "data_health": outcome.get("data_health"),
         "executed": outcome.get("executed"),
         "live_order": outcome.get("live_order"),
         "status": outcome.get("status"),

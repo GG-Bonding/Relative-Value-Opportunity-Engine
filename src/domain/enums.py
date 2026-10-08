@@ -131,3 +131,8 @@ class ModelReadiness(StrEnum):
     NOT_READY = "MODEL_NOT_READY"
     LOW = "LOW"
     READY = "READY"
+
+
+class DataHealth(StrEnum):
+    HEALTHY = "HEALTHY"
+    DEGRADED = "DEGRADED"

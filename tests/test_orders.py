@@ -72,7 +72,17 @@ def _position(ticket: int, side: int, volume: float, magic: int = 20261007) -> o
     return type("Position", (), {"ticket": ticket, "type": side, "volume": volume, "magic": magic})()
 
 
-def _broker(positions: list[object]) -> object:
+def test_a_failed_close_does_not_open_the_other_side(tmp_path: Path, monkeypatch) -> None:
+    terminal = _broker([_position(11, 0, 0.02)], fail_close=True)
+    monkeypatch.setitem(sys.modules, "MetaTrader5", terminal)
+    report = align_eurgbp("C:/terminal64.exe", "SHORT", "SIGNAL", 0.01, tmp_path / "orders.jsonl")
+    assert report["order_sent"] is False
+    assert len(terminal.requests) == 1
+    assert terminal.requests[0]["position"] == 11
+    assert report["orders"][1]["error"] == "close failed; new side was not opened"
+
+
+def _broker(positions: list[object], fail_close: bool = False) -> object:
     class _Terminal:
         ORDER_TYPE_BUY = 0
         ORDER_TYPE_SELL = 1
@@ -97,11 +107,23 @@ def _broker(positions: list[object]) -> object:
         def symbol_info_tick(self, symbol: str) -> _Tick:
             return _Tick()
 
+        def __init__(self) -> None:
+            self.positions = list(positions)
+            self.requests: list[dict[str, object]] = []
+
         def positions_get(self, symbol: str) -> list[object]:
-            return positions
+            return list(self.positions)
 
         def order_send(self, request: dict[str, object]) -> _Result:
             self.requests.append(request)
+            if "position" in request and fail_close:
+                failed = _Result()
+                failed.retcode = 10027
+                failed.comment = "close rejected"
+                return failed
+            if "position" in request:
+                ticket = request["position"]
+                self.positions = [row for row in self.positions if getattr(row, "ticket", None) != ticket]
             return _Result()
 
         def last_error(self) -> tuple[int, str]:

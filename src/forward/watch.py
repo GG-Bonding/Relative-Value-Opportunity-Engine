@@ -19,8 +19,10 @@ from domain.config import EngineConfig
 from domain.enums import ExecutionMode
 from domain.errors import DataValidationError
 from domain.timeutil import UTC, dump_ts, ensure_utc
+from execution.live_gate import live_order_allowed
 from forward.collect import fetch_curves, load_round_inputs
 from forward.journal import active_journal
+from forward.outcomes import current_lifecycle, score_due, write_alpha
 from forward.prints import usable_prints
 from forward.rates import RateSnapshot
 from forward.round import RoundInputs, run_round
@@ -121,6 +123,8 @@ def watch_loop(
             curves = pull_rates()
             curves_at = moment
         inputs = reader(moment, curves)
+        snapshot = score_due(store, inputs.tick, moment, config)
+        write_alpha(str(log_path), snapshot, moment)
         model_value = fair_value
         if model_value is None and quote_fair_value is not None:
             model_value = quote_fair_value(moment)
@@ -140,17 +144,32 @@ def watch_loop(
                 ingested_at=moment,
                 fair_value=model_value,
                 log_path=log_path,
+                alpha=current_lifecycle(store, config),
             )
             notice = _notice(triggers, _arrived(memory, inputs, moment, triggers), result, inputs)
-            tradable = result.get("decision") in {"LONG", "SHORT"} or notice["assessment"] == "REVERSAL"
-            if trader is not None and tradable:
-                try:
-                    trade = trader(result.get("decision"), str(notice["assessment"]))
-                except (DataValidationError, OSError, ValueError, TypeError) as exc:
-                    trade = {"order_sent": False, "action": "error", "live_order": str(exc), "orders": []}
-                notice["trade"] = trade
-                notice["order_sent"] = bool(trade.get("order_sent"))
-                notice["live_order"] = trade.get("live_order")
+            notice["alpha"] = snapshot
+            if trader is not None:
+                allowed, why = live_order_allowed(
+                    mode=str(result.get("mode") or execution.value),
+                    alpha=_text(result.get("alpha")),
+                    model_readiness=_text(result.get("model_readiness")),
+                    data_health=_text(result.get("data_health")),
+                    decision=_text(result.get("decision")),
+                    net_edge_pips=_pips(result.get("net_edge_pips")),
+                    min_net_edge_pips=config.opportunity.min_net_edge_pips,
+                    assessment=str(notice["assessment"]),
+                )
+                if allowed:
+                    try:
+                        trade = trader(result.get("decision"), str(notice["assessment"]))
+                    except (DataValidationError, OSError, ValueError, TypeError) as exc:
+                        trade = {"order_sent": False, "action": "error", "live_order": str(exc), "orders": []}
+                    notice["trade"] = trade
+                    notice["order_sent"] = bool(trade.get("order_sent"))
+                    notice["live_order"] = trade.get("live_order")
+                elif result.get("decision") in {"LONG", "SHORT"} or notice["assessment"] == "REVERSAL":
+                    notice["live_order"] = why
+                    notice["order_sent"] = False
             write(notice)
             memory = remember(memory, inputs, moment)
         cycles += 1
@@ -162,9 +181,7 @@ def watch_loop(
 
 def _fresh_prints(memory: WatchMemory, inputs: RoundInputs, ingested_at: datetime) -> list[str]:
     return [
-        item.event_id
-        for item in usable_prints(inputs.prints, ingested_at)
-        if item.event_id not in memory.event_ids
+        item.event_id for item in usable_prints(inputs.prints, ingested_at) if item.event_id not in memory.event_ids
     ]
 
 
@@ -231,6 +248,18 @@ def _emit(notice: dict[str, Any]) -> None:
     except UnicodeEncodeError:
         sys.stdout.buffer.write((text + "\n").encode("utf-8", errors="replace"))
         sys.stdout.buffer.flush()
+
+
+def _text(value: Any) -> str | None:
+    if isinstance(value, str):
+        return value
+    return None
+
+
+def _pips(value: Any) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        return None
+    return float(value)
 
 
 def _sleep(seconds: float) -> None:

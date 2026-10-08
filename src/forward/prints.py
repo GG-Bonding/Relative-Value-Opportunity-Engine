@@ -125,8 +125,9 @@ def as_events(prints: list[InformationPrint]) -> list[EventInput]:
                 headline=item.headline,
                 region=item.country if mapped else None,
                 category=item.indicator if mapped else None,
-                surprise=item.surprise,
+                surprise=None,
                 observed_at=item.event_time,
+                raw_surprise=item.surprise if mapped else None,
             )
         )
     return events

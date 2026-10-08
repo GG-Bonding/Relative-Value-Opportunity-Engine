@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Any
 
+from data.policy_news import policy_context
 from data.store import PitStore
 from domain.config import EngineConfig
 from domain.enums import (
@@ -27,11 +28,13 @@ from domain.timeutil import dump_ts, ensure_utc, parse_ts
 from execution.costs import expected_net_edge_pips
 from execution.decision import Decision, DecisionInput, decide
 from execution.exit import exit_reasons, invalidation_reasons
+from execution.live_gate import assess_data_health
 from forward.events import EventInput, combined_pressure, event_row, narratives_for
 from forward.execute import entry_fill, exit_fill
 from forward.journal import active_journal, append_journal, dump_detail, load_detail, opening_row
 from forward.mt5 import Mt5Tick
 from forward.rates import RateSnapshot
+from forward.standardize import standardize_events
 from opportunities.status import transition
 
 MT5_SOURCE = "mt5"
@@ -66,8 +69,23 @@ def run_forward(
     if ingested < tick.time:
         raise PointInTimeError("MT5 tick is after the ingest time")
     if store.has_forward_decision(execution.value, tick.time):
-        return {"duplicate": True, "mode": execution.value, "observed_at": dump_ts(tick.time), "executed": False}
+        return {
+            "duplicate": True,
+            "mode": execution.value,
+            "observed_at": dump_ts(tick.time),
+            "executed": False,
+            "alpha": alpha.value,
+            "net_edge_pips": None,
+            "data_health": assess_data_health(
+                rate_diff=book.rates.rate_diff,
+                bid=tick.bid,
+                ask=tick.ask,
+                fair_value=fair_value,
+                decision=None,
+            ).value,
+        }
 
+    book = replace(book, events=standardize_events(store, book.events, config))
     _persist_market(store, tick, ingested)
     _persist_rates(store, book.rates, tick.time, ingested)
     _persist_events(store, book.events, tick.time, ingested)
@@ -75,13 +93,14 @@ def run_forward(
     pressure = combined_pressure(book.events)
     narratives = narratives_for(book.events)
     regime = _regime(book.events)
-    decision, readiness = _decision(
+    decision, readiness, net_edge = _decision(
         book,
         config,
         fair_value=fair_value,
         alpha=alpha,
         pressure=pressure,
         regime=regime,
+        mode=execution,
     )
     follow_up = _follow(
         store,
@@ -102,6 +121,15 @@ def run_forward(
     follow_up["event_pressure"] = pressure
     follow_up["narratives"] = narratives
     follow_up["rate_diff"] = book.rates.rate_diff
+    follow_up["alpha"] = alpha.value
+    follow_up["net_edge_pips"] = net_edge
+    follow_up["data_health"] = assess_data_health(
+        rate_diff=book.rates.rate_diff,
+        bid=tick.bid,
+        ask=tick.ask,
+        fair_value=fair_value,
+        decision=decision.state.value,
+    ).value
     return follow_up
 
 
@@ -113,16 +141,19 @@ def _decision(
     alpha: AlphaLifecycle,
     pressure: float | None,
     regime: RegimeName,
-) -> tuple[Decision, ModelReadiness]:
+    mode: ExecutionMode,
+) -> tuple[Decision, ModelReadiness, float | None]:
     if book.rates.rate_diff is None:
         return (
             Decision(DecisionState.DATA_DEGRADED, None, EntryStrategy.WAIT, ["UK2Y or DE2Y is missing"]),
             ModelReadiness.NOT_READY if fair_value is None else ModelReadiness.LOW,
+            None,
         )
     if fair_value is None:
         return (
             Decision(DecisionState.WATCH, None, EntryStrategy.WAIT, ["fair value is MODEL_NOT_READY"]),
             ModelReadiness.NOT_READY,
+            None,
         )
     pips = (book.tick.mid - fair_value) / config.pip
     _edge, _cost, net = expected_net_edge_pips(
@@ -146,7 +177,9 @@ def _decision(
         reaction_lag_blocked=False,
     )
     readiness = ModelReadiness.READY if alpha is AlphaLifecycle.ACTIVE else ModelReadiness.LOW
-    return _research_decision(inputs, config), readiness
+    if mode is ExecutionMode.LIVE:
+        return decide(inputs, config), readiness, net
+    return _research_decision(inputs, config), readiness, net
 
 
 def _research_decision(inputs: DecisionInput, config: EngineConfig) -> Decision:
@@ -564,6 +597,8 @@ def _regime(events: list[EventInput]) -> RegimeName:
         return RegimeName.INFLATION_DIVERGENCE
     if categories & _GROWTH:
         return RegimeName.GROWTH_DIVERGENCE
+    if any(policy_context(event.headline) is not None for event in events):
+        return RegimeName.POLICY_DIVERGENCE
     return RegimeName.NEUTRAL
 
 

@@ -52,10 +52,11 @@ def test_flash_headline_does_not_create_a_trade(tmp_path: Path) -> None:
     )
     result = _run(store, ExecutionMode.SHADOW, _book(ENTRY, 0.8557, 0.8563, events=[headline]), None)
     assert result["decision"] == "WATCH"
-    assert result["event_pressure"] == pytest.approx(0.7)
+    assert result["event_pressure"] is None
     assert "BUY" not in " ".join(result["reasons"])
+    assert any("does not set an EURGBP factor" in line for line in result["narratives"])
     stored = store.rows("information_events")
-    assert stored[0]["pressure"] == pytest.approx(0.7)
+    assert stored[0]["pressure"] is None
     assert "BUY EURGBP" in stored[0]["headline"]
     store.close()
 
@@ -81,9 +82,12 @@ def test_shadow_and_paper_share_the_signal_and_only_paper_fills(tmp_path: Path) 
     shadow = _run(store, ExecutionMode.SHADOW, book, FAIR)
     paper = _run(store, ExecutionMode.PAPER, book, FAIR)
     live = _run(store, ExecutionMode.LIVE, book, FAIR)
-    assert shadow["decision"] == paper["decision"] == live["decision"] == "SHORT"
-    assert shadow["reasons"] == paper["reasons"] == live["reasons"]
+    assert shadow["decision"] == paper["decision"] == "SHORT"
+    assert live["decision"] == "WATCH"
+    assert shadow["reasons"] == paper["reasons"]
     assert "research sample; alpha is not ACTIVE" in paper["reasons"]
+    assert "alpha is DISCOVERY" in " ".join(live["reasons"])
+    assert "research sample" not in " ".join(live["reasons"])
     assert shadow["fill_price"] is None
     assert shadow["executed"] is False
     assert shadow["status"] == "READY"
@@ -95,7 +99,7 @@ def test_shadow_and_paper_share_the_signal_and_only_paper_fills(tmp_path: Path) 
     assert live["executed"] is False
     assert live["fill_price"] is None
     assert live["live_order"] == "not armed"
-    assert live["status"] == "READY"
+    assert live["status"] is None
     store.close()
 
 
@@ -240,9 +244,8 @@ def test_cli_paper_uses_the_mt5_file_and_live_does_not_order(tmp_path: Path) -> 
     )
     assert live == 2
     live_store = PitStore(tmp_path / "live.duckdb")
-    live_row = live_store.rows("opportunity_journal")[0]
-    assert live_row["fill_price"] is None
-    assert live_row["status"] == "READY"
+    assert live_store.rows("opportunity_journal") == []
+    assert live_store.rows("forward_decisions")[0]["decision"] == "WATCH"
     live_store.close()
 
 
@@ -267,7 +270,7 @@ def _book(
 
 
 def _cpi(moment: datetime) -> EventInput:
-    return EventInput("uk-cpi", "CALENDAR", "UK CPI", "UK", "CPI", 2.1, moment)
+    return EventInput("uk-cpi", "CALENDAR", "UK CPI", "UK", "CPI", 0.7, moment)
 
 
 def _opening(store: PitStore, opportunity_id: object) -> dict[str, object]:

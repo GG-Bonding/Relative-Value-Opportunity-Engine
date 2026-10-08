@@ -217,6 +217,9 @@ def _watch(args: argparse.Namespace, config: EngineConfig) -> int:
     if args.interval <= 0:
         print("interval must be positive", file=sys.stderr)
         return 2
+    if args.trade and args.mode != "live":
+        print("--trade requires --mode live", file=sys.stderr)
+        return 2
     if args.trade and args.lots <= 0:
         print("lots must be positive", file=sys.stderr)
         return 2

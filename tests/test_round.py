@@ -112,8 +112,8 @@ def test_uk_cpi_surprise_does_not_become_a_short_without_fair_value(tmp_path: Pa
     assert result["decision"] == "WATCH"
     assert result["model_readiness"] == "MODEL_NOT_READY"
     assert result["direction"] is None
-    assert result["event_pressure"] == pytest.approx(-0.2 / 3)
-    assert result["narratives"] == ["UK CPI above expectation → GBP relative support → EURGBP bearish factor"]
+    assert result["event_pressure"] is None
+    assert result["narratives"] == []
     assert "SHORT" not in result["reasons"]
 
 
@@ -149,8 +149,10 @@ def test_shadow_paper_and_live_share_the_signal(tmp_path: Path) -> None:
     shadow = _round(tmp_path, book, FAIR, mode=ExecutionMode.SHADOW, name="shadow")
     paper = _round(tmp_path, book, FAIR, mode=ExecutionMode.PAPER, name="paper")
     live = _round(tmp_path, book, FAIR, mode=ExecutionMode.LIVE, name="live")
-    assert shadow["decision"] == paper["decision"] == live["decision"] == "SHORT"
-    assert shadow["reasons"] == paper["reasons"] == live["reasons"]
+    assert shadow["decision"] == paper["decision"] == "SHORT"
+    assert live["decision"] == "WATCH"
+    assert shadow["reasons"] == paper["reasons"]
+    assert "alpha is DISCOVERY" in " ".join(str(reason) for reason in live["reasons"])
     assert shadow["fill_price"] is None
     assert shadow["executed"] is False
     assert paper["executed"] is True
@@ -235,9 +237,7 @@ def test_cli_round_defaults_to_shadow_and_live_stays_unarmed(tmp_path: Path, mon
 
     monkeypatch.setattr("forward.collect.load_round_inputs", fake)
     log = tmp_path / "rounds.jsonl"
-    code = main(
-        ["--db", str(tmp_path / "shadow.duckdb"), "--config", str(CONFIG), "round", "--log", str(log)]
-    )
+    code = main(["--db", str(tmp_path / "shadow.duckdb"), "--config", str(CONFIG), "round", "--log", str(log)])
     assert code == 0
     recorded = json.loads(log.read_text(encoding="utf-8"))
     assert recorded["mode"] == "SHADOW"
