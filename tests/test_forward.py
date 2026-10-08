@@ -52,10 +52,10 @@ def test_flash_headline_does_not_create_a_trade(tmp_path: Path) -> None:
     )
     result = _run(store, ExecutionMode.SHADOW, _book(ENTRY, 0.8557, 0.8563, events=[headline]), None)
     assert result["decision"] == "WATCH"
-    assert result["event_pressure"] is None
+    assert result["event_pressure"] == pytest.approx(0.7)
     assert "BUY" not in " ".join(result["reasons"])
     stored = store.rows("information_events")
-    assert stored[0]["pressure"] is None
+    assert stored[0]["pressure"] == pytest.approx(0.7)
     assert "BUY EURGBP" in stored[0]["headline"]
     store.close()
 

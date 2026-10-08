@@ -9,6 +9,8 @@ dist/
 build/
 *.egg-info/
 *.duckdb
+*.duckdb.wal
+data/forward/
 artifacts/runs/
 .DS_Store
 .env

@@ -6,7 +6,9 @@ import argparse
 import json
 import os
 import sys
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from api.service import EngineService
 from data.laboratory import build_laboratory
@@ -56,6 +58,23 @@ def main(argv: list[str] | None = None) -> int:
     forward.add_argument("--rates", required=True)
     forward.add_argument("--events")
     forward.add_argument("--fair-value", dest="fair_value", type=float)
+    automatic = sub.add_parser("round")
+    automatic.add_argument("--mode", choices=["shadow", "paper", "live"], default="shadow")
+    automatic.add_argument("--log", default="data/forward/rounds.jsonl")
+    automatic.add_argument("--terminal", default=None)
+    automatic.add_argument("--fair-value", dest="fair_value", type=float)
+    watch = sub.add_parser("watch")
+    watch.add_argument("--mode", choices=["shadow", "paper", "live"], default="shadow")
+    watch.add_argument("--log", default="data/forward/rounds.jsonl")
+    watch.add_argument("--terminal", default=None)
+    watch.add_argument("--fair-value", dest="fair_value", type=float)
+    watch.add_argument("--interval", type=float, default=60.0)
+    watch.add_argument("--trade", action="store_true")
+    watch.add_argument("--lots", type=float, default=0.01)
+    desk = sub.add_parser("desk")
+    desk.add_argument("--log", default="data/forward/rounds.jsonl")
+    desk.add_argument("--host", default="127.0.0.1")
+    desk.add_argument("--port", type=int, default=8780)
 
     args = parser.parse_args(argv)
     if args.command == "mechanisms":
@@ -103,6 +122,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "forward":
         return _forward(args, config)
+    if args.command == "round":
+        return _round(args, config)
+    if args.command == "watch":
+        return _watch(args, config)
+    if args.command == "desk":
+        return _desk(args)
     if not Path(args.db).exists():
         print(f"no store at {args.db}. Run rv ingest --laboratory first.", file=sys.stderr)
         return 2
@@ -148,6 +173,106 @@ def _forward(args: argparse.Namespace, config: EngineConfig) -> int:
     print(json.dumps(result, ensure_ascii=False))
     if args.mode == "live":
         return 2
+    return 0
+
+
+def _round(args: argparse.Namespace, config: EngineConfig) -> int:
+    from datetime import datetime
+
+    from domain.timeutil import UTC
+    from forward.collect import load_round_inputs
+    from forward.round import run_round
+
+    _load_local_env()
+    path = Path(args.db)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ingested = datetime.now(tz=UTC)
+    inputs = load_round_inputs(args.terminal, ingested)
+    store = PitStore(path)
+    try:
+        result = run_round(
+            store,
+            config,
+            args.mode,
+            inputs,
+            ingested_at=ingested,
+            fair_value=args.fair_value,
+            log_path=Path(args.log),
+        )
+    finally:
+        store.close()
+    print(json.dumps(result, ensure_ascii=False))
+    if args.mode == "live":
+        return 2
+    return 0
+
+
+def _watch(args: argparse.Namespace, config: EngineConfig) -> int:
+    from forward.live_value import caching_rate_value
+    from forward.watch import watch_loop
+
+    _load_local_env()
+    path = Path(args.db)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if args.interval <= 0:
+        print("interval must be positive", file=sys.stderr)
+        return 2
+    if args.trade and args.lots <= 0:
+        print("lots must be positive", file=sys.stderr)
+        return 2
+    trader = _trader(args) if args.trade else None
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if reconfigure is not None:
+        try:
+            reconfigure(encoding="utf-8")
+        except (AttributeError, OSError):
+            pass
+    store = PitStore(path)
+    try:
+        return watch_loop(
+            store,
+            config,
+            args.mode,
+            terminal=args.terminal,
+            fair_value=args.fair_value,
+            log_path=Path(args.log),
+            interval_seconds=args.interval,
+            quote_fair_value=None if args.fair_value is not None else caching_rate_value(args.terminal, config),
+            trader=trader,
+        )
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        store.close()
+
+
+def _trader(args: argparse.Namespace) -> Callable[[Any, str], dict[str, Any]]:
+    from forward.orders import align_eurgbp
+
+    order_log = Path(args.log).with_name("orders.jsonl")
+
+    def send(decision: Any, assessment: str) -> dict[str, Any]:
+        return align_eurgbp(
+            args.terminal,
+            decision if isinstance(decision, str) else None,
+            assessment,
+            args.lots,
+            order_log,
+        )
+
+    return send
+
+
+def _desk(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    from api.desk import create_desk_app
+
+    if args.port < 1 or args.port > 65535:
+        print("port must be between 1 and 65535", file=sys.stderr)
+        return 2
+    print(f"http://{args.host}:{args.port}/")
+    uvicorn.run(create_desk_app(Path(args.log)), host=args.host, port=args.port, log_level="info")
     return 0
 
 

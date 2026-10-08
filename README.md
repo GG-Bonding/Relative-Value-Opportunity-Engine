@@ -12,7 +12,7 @@ The engine stores point-in-time observations, including macro revisions. It buil
 
 `rv ingest --jin10` appends the current Jin10 week: calendar, flash, and news as information, plus the EURUSD/GBPUSD cross. Jin10 has no EURGBP code and no bid or ask. Set `JIN10_TOKEN`. See `docs/data-sources.md`.
 
-`rv forward` is the live path. It reads an MT5 tick file for EURGBP bid and ask, a separate UK2Y and DE2Y file, and an optional event file. Shadow records the call. Paper sells the bid and buys the ask. Live uses the same signal and does not send an order. The opening journal row is not edited. See `docs/forward-evaluation.md`.
+`rv round` is the automatic live path. One run reads Jin10 calendar, flash, and news, the official UK2Y and DE2Y daily curves, and the local MT5 EURGBP bid and ask. Shadow records the call. Paper sells the bid and buys the ask. Live uses the same signal and does not send an order. The opening journal row is not edited; each run appends a log line. `rv watch` keeps that same path running: one baseline judgment, then another only when new information, a new rate day, or an open-book tick arrives. `rv desk` opens a local page on that log. `rv forward` still accepts those three inputs as files. See `docs/forward-evaluation.md`.
 
 Kalman filtering and any pair other than EURGBP are not implemented. Both wait on a stable out-of-sample result on real vintages.
 
@@ -25,6 +25,11 @@ uv run ruff check src tests
 uv run mypy
 uv run rv ingest --laboratory --db data/normalized/eurgbp.duckdb
 uv run rv ingest --jin10 --db data/normalized/eurgbp-jin10.duckdb
+uv run rv round
+uv run rv round --mode paper
+uv run rv watch
+uv run rv watch --trade
+uv run rv desk
 uv run rv forward --mode paper --tick data/mt5/eurgbp_tick.json --rates data/rates/latest.json
 uv run rv mechanisms EURGBP
 uv run rv research-report --db data/normalized/eurgbp.duckdb

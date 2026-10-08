@@ -8,7 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from data.information import event_narrative, information_event, relative_pressure
+from data.information import event_contribution, event_narrative, information_event
+from data.policy_news import policy_narrative
 from domain.errors import DataValidationError
 from forward.mt5 import parse_feed_time
 
@@ -57,14 +58,17 @@ def narratives_for(events: list[EventInput]) -> list[str]:
     lines: list[str] = []
     for event in events:
         line = event_narrative(event.region, event.category, event.surprise, event.headline)
+        policy = policy_narrative(event.headline)
         if line is not None:
             lines.append(line)
+        if policy is not None:
+            lines.append(policy)
     return lines
 
 
 def combined_pressure(events: list[EventInput]) -> float | None:
     values = [
-        relative_pressure(event.region, event.category, event.surprise, event.headline)
+        event_contribution(event.region, event.category, event.surprise, event.headline)
         for event in events
     ]
     known = [value for value in values if value is not None]

@@ -42,7 +42,7 @@ Another pair needs the same revision-safe data and a separate mechanism registry
 
 ## Phase 24.5
 
-The laboratory backtest stays the machinery test. It is not a claim about live EURGBP. From the first forward run, each call is appended and left as it was. Later ticks append a new journal row for convergence, a closed gap, or a thesis break. Jin10 calendars, flashes, and headlines are stored as information. EURGBP bid and ask come from an MT5 tick file. UK2Y and DE2Y come from a separate rate file. A missing rate is not stored as zero. `rv forward --mode live` records the same signal and does not send an order.
+The laboratory backtest stays the machinery test. It is not a claim about live EURGBP. From the first forward run, each call is appended and left as it was. Later ticks append a new journal row for convergence, a closed gap, or a thesis break. `rv round` reads Jin10 calendars, flashes, and headlines as information, the official UK and German 2-year daily curves, and the local MT5 EURGBP book. A missing rate is not stored as zero. Shadow, paper, and live share the signal. `rv round --mode live` records it and does not send an order.
 
 ## Still outside V1
 

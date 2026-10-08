@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +21,10 @@ class RateSnapshot:
 
     @property
     def rate_diff(self) -> float | None:
-        if self.uk2y is None or self.de2y is None:
+        """UK2Y minus DE2Y, in percentage points, only on one shared trading day."""
+        if self.uk2y is None or self.de2y is None or self.uk2y_time is None or self.de2y_time is None:
+            return None
+        if self.uk2y_time.astimezone(UTC).date() != self.de2y_time.astimezone(UTC).date():
             return None
         return self.uk2y - self.de2y
 

@@ -29,4 +29,6 @@ Naive calendar times are Shanghai local time, then stored as UTC. A second inges
 
 This feed cannot replace the laboratory backtest. One week of releases and a short minute window do not identify whether EURGBP has out-of-sample alpha.
 
-Jin10 is the information layer for forward evaluation: calendar, flash, and news. It does not supply the fill. EURGBP bid and ask come from the MT5 tick file written by `adapters/mt5/EURGBP_TickExport.mq5`. UK2Y and DE2Y come from a separate rate file. See `docs/forward-evaluation.md`.
+Jin10 is the information layer for forward evaluation: calendar, flash, and news. It does not supply the fill. `rv round` reads that MCP feed and does not call Jin10 for a quote or a yield.
+
+UK2Y is the Bank of England GLC Nominal spot curve at 2.0 years, sheet `4. spot curve` in the latest yield-curve zip. DE2Y is the Bundesbank Svensson yield with residual maturity 2.0 years, series `BBSIS.D.I.ZST.ZI.EUR.S1311.B.A604.R02XX.R.A.A._Z._Z.A`. The spread is calculated only on a shared trading day. EURGBP bid and ask come from the local MetaTrader 5 `SymbolInfoTick` on Windows. The tick file written by `adapters/mt5/EURGBP_TickExport.mq5` remains the file input for `rv forward`. See `docs/forward-evaluation.md`.
