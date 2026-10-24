@@ -1,0 +1,43 @@
+# EURGBP M5 deviation mean reversion.
+# The baseline is price-deviation Z only. Return Z and the H1 filter are off
+# until an ablation on the same tape shows a gain. Thresholds below are the
+# pre-registered values used when those filters are enabled.
+
+[strategy]
+ema_period = 24
+dev_window = 72
+ret_window = 48
+z_entry = 2.0
+ret_z_threshold = 2.0
+use_return_filter = false
+reversal_gap = 0.25
+confirm_bars = 3
+ret_lookback = 2
+atr_period = 14
+atr_mult = 1.5
+min_rr = 1.2
+max_hold_minutes = 60
+cooldown_bars = 3
+use_trend_filter = false
+h1_ema_period = 20
+h1_adx_period = 14
+h1_adx_level = 25.0
+h1_slope_bars = 3
+max_spread_pips = 1.5
+risk_fraction = 0.005
+daily_loss_fraction = 0.02
+max_trades_per_day = 3
+slippage_pips = 0.0
+pip = 0.0001
+allow_long = true
+allow_short = true
+session_start_minute = 480
+session_end_minute = 1020
+event_before_minutes = 15
+event_after_minutes = 15
+event_filter = "optional"
+calendar_max_age_days = 14
+max_entry_jump_atr = 0.5
+initial_equity = 1000.0
+min_trades = 30
+max_drawdown_fraction = 0.10
