@@ -8,6 +8,7 @@ module does not assume an Anzo Capital offset.
 
 from __future__ import annotations
 
+import calendar
 import math
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -116,6 +117,35 @@ def event_block_mask(
         elif mode == "required" and status == "stale" and last is not None and utc >= last:
             mask[index] = True
     return mask
+
+
+def london_is_bst(stamp: datetime) -> bool:
+    """British Summer Time using the last Sunday rule, for the MQL5 clock.
+
+    BST is `[last Sunday of March 01:00 UTC, last Sunday of October 01:00 UTC)`.
+    `in_london_session` uses the zone database. Tests check that these agree.
+    """
+    utc = require_utc(stamp)
+    start = _last_sunday(utc.year, 3)
+    end = _last_sunday(utc.year, 10)
+    return start <= utc < end
+
+
+def manual_in_london_session(stamp: datetime, start_minute: int, end_minute: int) -> bool:
+    """Same session rule as the EA: weekday London clock, offset +1 during BST."""
+    utc = require_utc(stamp)
+    local = utc + timedelta(hours=1 if london_is_bst(utc) else 0)
+    if local.weekday() >= 5:
+        return False
+    minute = local.hour * 60 + local.minute
+    return start_minute <= minute < end_minute
+
+
+def _last_sunday(year: int, month: int) -> datetime:
+    day = calendar.monthrange(year, month)[1]
+    while datetime(year, month, day).weekday() != 6:
+        day -= 1
+    return datetime(year, month, day, 1, 0, tzinfo=UTC)
 
 
 def live_entries_allowed(mode: str, status: str) -> bool:
