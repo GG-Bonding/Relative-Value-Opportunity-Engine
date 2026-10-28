@@ -1,0 +1,82 @@
+{
+  "source": "Ehsanrs2/Forex_Factory_Calendar forex_factory_cache.csv",
+  "snapshot_through": "2025-04-07T22:30:00+04:30",
+  "releases": 450,
+  "quoted": 358,
+  "imputed": 92,
+  "dropped_untimed": 283,
+  "dropped_titles": [
+    {
+      "event": "German Flash Services PMI",
+      "count": 62
+    },
+    {
+      "event": "Flash Services PMI",
+      "count": 38
+    },
+    {
+      "event": "Monetary Policy Statement",
+      "count": 30
+    },
+    {
+      "event": "German Prelim CPI m/m",
+      "count": 26
+    },
+    {
+      "event": "French Flash Services PMI",
+      "count": 25
+    },
+    {
+      "event": "Claimant Count Change",
+      "count": 20
+    },
+    {
+      "event": "GDP m/m",
+      "count": 14
+    },
+    {
+      "event": "Retail Sales m/m",
+      "count": 13
+    },
+    {
+      "event": "Monetary Policy Summary",
+      "count": 12
+    },
+    {
+      "event": "CPI y/y",
+      "count": 9
+    },
+    {
+      "event": "BOE Monetary Policy Report",
+      "count": 8
+    },
+    {
+      "event": "MPC Official Bank Rate Votes",
+      "count": 7
+    },
+    {
+      "event": "Official Bank Rate",
+      "count": 7
+    },
+    {
+      "event": "German Flash Manufacturing PMI",
+      "count": 4
+    },
+    {
+      "event": "CPI Flash Estimate y/y",
+      "count": 4
+    },
+    {
+      "event": "Spanish Flash CPI y/y",
+      "count": 2
+    },
+    {
+      "event": "Flash Manufacturing PMI",
+      "count": 1
+    },
+    {
+      "event": "Prelim GDP q/q",
+      "count": 1
+    }
+  ]
+}

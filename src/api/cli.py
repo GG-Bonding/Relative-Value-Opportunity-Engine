@@ -76,9 +76,34 @@ def main(argv: list[str] | None = None) -> int:
     desk.add_argument("--host", default="127.0.0.1")
     desk.add_argument("--port", type=int, default=8780)
 
+    m15_fetch = sub.add_parser("m15-fetch")
+    m15_fetch.add_argument("--start-year", type=int, default=2020)
+    m15_fetch.add_argument("--end-year", type=int, default=2025)
+    m15_fetch.add_argument("--out-dir", default="data/m15")
+    m15 = sub.add_parser("m15-backtest")
+    m15.add_argument("--m15", required=True)
+    m15.add_argument("--daily")
+    m15.add_argument("--output", default="artifacts/m15-meanrev-report.md")
+    m15.add_argument("--trades", default="artifacts/m15-meanrev-trades.csv")
+    m15.add_argument("--z-entry", type=float, default=2.0)
+    m15.add_argument("--n-short", type=int, default=20)
+    m15.add_argument("--t-max", type=int, default=60)
+    m15.add_argument("--spread-pips", type=float, default=1.2)
+    m15.add_argument("--long-filter", choices=["on", "off", "strict"], default="on")
+    m15.add_argument("--price-side", choices=["bid", "mid"], default="bid")
+    m15.add_argument("--session-start", default="07:00")
+    m15.add_argument("--session-end", default="17:00")
+    m15.add_argument("--timestamp-is-open", action="store_true")
+    m15.add_argument("--source", default="")
+    m15.add_argument("--events", default="", help="CSV of release_time_utc,currency,event,timing")
+
     args = parser.parse_args(argv)
     if args.command == "mechanisms":
         return _mechanisms(args.pair)
+    if args.command == "m15-fetch":
+        return _m15_fetch(args)
+    if args.command == "m15-backtest":
+        return _m15_backtest(args)
     config = load_config(Path(args.config))
     if args.command == "ingest":
         if args.laboratory and args.jin10:
@@ -369,6 +394,69 @@ def _dispatch(service: EngineService, args: argparse.Namespace) -> int:
         print(f"unknown command {args.command}", file=sys.stderr)
         return 2
     return 0
+
+
+def _m15_fetch(args: argparse.Namespace) -> int:
+    from m15meanrev.histdata import fetch_m15
+
+    m15_path, daily_path = fetch_m15(args.start_year, args.end_year, Path(args.out_dir))
+    print(json.dumps({"m15": str(m15_path), "daily": str(daily_path)}))
+    return 0
+
+
+def _m15_backtest(args: argparse.Namespace) -> int:
+    from m15meanrev.backtest import StrategyParams
+    from m15meanrev.load import daily_from_m15, load_bars, load_daily
+    from m15meanrev.report import sample_info, write_report
+
+    bars = load_bars(Path(args.m15), timestamp_is_open=args.timestamp_is_open)
+    daily = load_daily(Path(args.daily)) if args.daily else daily_from_m15(bars)
+    source = args.source
+    if not source:
+        sidecar = Path(args.m15).parent / "source.txt"
+        source = sidecar.read_text(encoding="utf-8").strip() if sidecar.exists() else args.m15
+    note = "CSV 的 datetime 是 M15 收盘。无时区的值按 UTC。"
+    if args.timestamp_is_open:
+        note = "CSV 的 datetime 是 M15 开盘，读取时已加 15 分钟作为收盘。"
+    params = StrategyParams(
+        z_entry=args.z_entry,
+        n_short=args.n_short,
+        t_max_minutes=args.t_max,
+        spread_pips=args.spread_pips,
+        long_filter=args.long_filter,
+        price_side=args.price_side,
+        session_start_minute=_clock_minute(args.session_start),
+        session_end_minute=_clock_minute(args.session_end),
+    )
+    from m15meanrev.calendar import describe_calendar, entry_windows, load_events
+
+    blacklist = entry_windows(())
+    calendar_note = ""
+    if args.events:
+        releases = load_events(Path(args.events))
+        blacklist = entry_windows(release.time for release in releases)
+        calendar_note = describe_calendar(Path(args.events))
+    output = Path(args.output)
+    write_report(
+        bars,
+        daily,
+        output,
+        Path(args.trades),
+        sample_info(bars, source, note),
+        params,
+        blacklist,
+        calendar_note,
+    )
+    print(output)
+    return 0
+
+
+def _clock_minute(value: str) -> int:
+    hour, minute = value.split(":")
+    total = int(hour) * 60 + int(minute)
+    if not 0 <= total <= 24 * 60:
+        raise ValueError(f"bad clock {value}")
+    return total
 
 
 if __name__ == "__main__":

@@ -14,6 +14,8 @@ The engine stores point-in-time observations, including macro revisions. It buil
 
 `rv round` is the automatic live path. One run reads Jin10 calendar, flash, and news, the official UK2Y and DE2Y daily curves, and the local MT5 EURGBP bid and ask. Shadow records the call. Paper sells the bid and buys the ask. Live uses the same signal and does not send an order. The opening journal row is not edited; each run appends a log line. `rv watch` keeps that same path running: one baseline judgment, then another only when new information, a new rate day, or an open-book tick arrives. It also scores frozen opportunities at one hour, one day, three days, and five days, and the desk shows that hit rate, convergence, after-cost result, and alpha state. `rv watch --trade` is refused unless the mode is live, and a live order still waits until alpha is ACTIVE. `rv desk` opens a local page on that log. `rv forward` still accepts those three inputs as files. See `docs/forward-evaluation.md`.
 
+`rv m15-backtest` is a separate EURGBP book. The entry is the z-score of the log return on the M15 bar that just closed. The daily price z-score only decides whether a long is allowed, and it is the previous trading day's value. Fills pay a spread. It does not use the ridge fair value.
+
 Kalman filtering and any pair other than EURGBP are not implemented. Both wait on a stable out-of-sample result on real vintages.
 
 ## Run
@@ -33,6 +35,8 @@ uv run rv desk
 uv run rv forward --mode paper --tick data/mt5/eurgbp_tick.json --rates data/rates/latest.json
 uv run rv mechanisms EURGBP
 uv run rv research-report --db data/normalized/eurgbp.duckdb
+uv run rv m15-fetch --start-year 2020 --end-year 2025 --out-dir data/m15
+uv run rv m15-backtest --m15 data/m15/eurgbp-m15.csv --daily data/m15/eurgbp-d1.csv --events configs/uk-ez-releases.csv
 ```
 
 The HTTP surface is `create_app` in `api.app`. It serves `/healthz`, `/readyz`, the EURGBP state routes, opportunities, and backtests.

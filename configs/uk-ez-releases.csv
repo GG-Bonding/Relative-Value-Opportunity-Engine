@@ -1,0 +1,451 @@
+release_time_utc,currency,event,timing
+2019-12-12T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2019-12-12T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2019-12-16T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2019-12-16T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2019-12-16T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2019-12-18T09:30:00+00:00,GBP,CPI y/y,quoted
+2019-12-19T09:30:00+00:00,GBP,Retail Sales m/m,quoted
+2019-12-19T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2019-12-19T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-01-15T09:30:00+00:00,GBP,CPI y/y,quoted
+2020-01-16T12:30:00+00:00,EUR,ECB Monetary Policy Meeting Accounts,quoted
+2020-01-17T09:30:00+00:00,GBP,Retail Sales m/m,quoted
+2020-01-23T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-01-23T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2020-01-24T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-01-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-01-30T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2020-01-30T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-01-30T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2020-01-30T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2020-02-11T09:30:00+00:00,GBP,Prelim GDP q/q,quoted
+2020-02-14T07:00:00+00:00,EUR,German Prelim GDP q/q,quoted
+2020-02-19T09:30:00+00:00,GBP,CPI y/y,quoted
+2020-02-20T09:30:00+00:00,GBP,Retail Sales m/m,quoted
+2020-02-20T12:30:00+00:00,EUR,ECB Monetary Policy Meeting Accounts,quoted
+2020-02-21T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-02-21T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-02-21T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2020-03-11T07:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-03-11T07:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-03-11T07:00:00+00:00,GBP,Official Bank Rate,imputed
+2020-03-12T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-03-12T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2020-03-19T14:30:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-03-19T14:30:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-03-19T14:30:00+00:00,GBP,Official Bank Rate,imputed
+2020-03-24T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-03-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-03-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2020-03-25T07:00:00+00:00,GBP,CPI y/y,quoted
+2020-03-26T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-03-26T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-03-26T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2020-04-09T11:30:00+00:00,EUR,ECB Monetary Policy Meeting Accounts,quoted
+2020-04-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-04-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-04-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2020-04-24T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2020-04-30T11:45:00+00:00,EUR,ECB Press Conference,imputed
+2020-04-30T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-04-30T11:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2020-05-13T06:00:00+00:00,GBP,Prelim GDP q/q,quoted
+2020-05-15T08:00:00+00:00,EUR,German Prelim GDP q/q,quoted
+2020-05-19T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2020-05-21T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-05-21T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-05-22T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2020-05-22T11:30:00+00:00,EUR,ECB Monetary Policy Meeting Accounts,quoted
+2020-06-03T08:30:00+00:00,GBP,Final Services PMI,quoted
+2020-06-04T11:45:00+00:00,EUR,ECB Press Conference,imputed
+2020-06-04T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-06-04T11:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2020-06-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2020-06-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-06-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-07-16T11:45:00+00:00,EUR,ECB Press Conference,imputed
+2020-07-16T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-07-16T11:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2020-07-24T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-07-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-07-30T08:00:00+00:00,EUR,German Prelim GDP q/q,quoted
+2020-08-21T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-08-21T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-09-10T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-09-10T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2020-09-17T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-09-17T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-09-17T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2020-09-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-09-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-10-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-10-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-10-29T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-10-29T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2020-11-23T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-11-23T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-12-10T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2020-12-10T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2020-12-16T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2020-12-16T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2020-12-17T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2020-12-17T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2020-12-17T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2021-01-21T12:45:00+00:00,EUR,ECB Press Conference,imputed
+2021-01-21T12:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-01-22T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2021-01-22T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-02-17T07:00:00+00:00,GBP,CPI y/y,quoted
+2021-02-19T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2021-02-19T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-02-19T09:30:00+00:00,GBP,Flash Services PMI,quoted
+2021-03-11T12:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-03-11T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2021-03-18T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2021-03-18T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2021-03-18T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2021-03-24T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2021-03-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-04-22T11:45:00+00:00,EUR,ECB Press Conference,imputed
+2021-04-22T11:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-04-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2021-04-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-05-21T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-06-10T11:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-06-10T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2021-06-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-07-22T11:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-07-22T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2021-07-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-08-18T06:00:00+00:00,GBP,CPI y/y,quoted
+2021-08-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-09-09T11:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-09-09T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2021-09-15T06:00:00+00:00,GBP,CPI y/y,quoted
+2021-10-22T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-10-28T11:45:00+00:00,EUR,Monetary Policy Statement,quoted
+2021-10-28T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2021-11-17T07:00:00+00:00,GBP,CPI y/y,quoted
+2021-11-23T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2021-12-15T07:00:00+00:00,GBP,CPI y/y,quoted
+2021-12-16T12:45:00+00:00,EUR,ECB Press Conference,imputed
+2021-12-16T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2021-12-16T12:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2022-01-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-02-03T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-02-03T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2022-02-16T07:00:00+00:00,GBP,CPI y/y,quoted
+2022-02-21T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-03-10T12:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-03-10T13:30:00+00:00,EUR,ECB Press Conference,quoted
+2022-03-17T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-03-17T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2022-03-17T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-03-23T07:00:00+00:00,GBP,CPI y/y,quoted
+2022-04-13T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-04-14T11:45:00+00:00,EUR,ECB Press Conference,imputed
+2022-04-14T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-04-14T11:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2022-04-22T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-05-05T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2022-05-05T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-05-05T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2022-05-05T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-05-18T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-05-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-06-09T11:45:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-06-09T12:30:00+00:00,EUR,ECB Press Conference,quoted
+2022-06-16T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-06-16T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2022-06-16T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-06-22T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-06-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-07-01T09:00:00+00:00,EUR,CPI Flash Estimate y/y,quoted
+2022-07-21T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-07-21T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2022-07-22T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-07-22T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-07-22T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2022-08-04T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2022-08-04T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-08-04T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2022-08-04T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-08-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2022-08-17T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-08-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-08-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-08-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2022-09-08T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-09-08T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2022-09-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2022-09-14T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-09-22T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-09-22T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2022-09-22T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-09-23T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-09-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-09-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2022-10-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2022-10-19T06:00:00+00:00,GBP,CPI y/y,quoted
+2022-10-24T07:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-10-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-10-24T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2022-10-27T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2022-10-27T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2022-11-03T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2022-11-03T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-11-03T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2022-11-03T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-11-16T07:00:00+00:00,GBP,CPI y/y,quoted
+2022-11-23T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-11-23T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-11-23T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2022-12-12T07:00:00+00:00,GBP,GDP m/m,quoted
+2022-12-14T07:00:00+00:00,GBP,CPI y/y,quoted
+2022-12-15T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2022-12-15T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2022-12-15T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2022-12-15T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2022-12-15T13:45:00+00:00,EUR,Main Refinancing Rate,imputed
+2022-12-15T13:45:00+00:00,EUR,Monetary Policy Statement,imputed
+2022-12-16T08:15:00+00:00,EUR,French Flash Services PMI,quoted
+2022-12-16T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2022-12-16T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-01-13T07:00:00+00:00,GBP,GDP m/m,quoted
+2023-01-18T07:00:00+00:00,GBP,CPI y/y,quoted
+2023-01-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-02-02T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2023-02-02T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-02-02T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2023-02-02T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-02-02T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-02-02T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-02-10T07:00:00+00:00,GBP,GDP m/m,quoted
+2023-02-15T07:00:00+00:00,GBP,CPI y/y,quoted
+2023-02-21T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-03-14T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2023-03-16T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-03-16T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-03-22T07:00:00+00:00,GBP,CPI y/y,quoted
+2023-03-23T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-03-23T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2023-03-23T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-03-24T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-03-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-03-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-04-18T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2023-04-19T06:00:00+00:00,GBP,CPI y/y,quoted
+2023-04-21T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-04-21T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-04-21T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-05-04T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-05-04T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-05-11T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2023-05-11T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-05-11T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2023-05-11T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-05-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2023-05-16T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2023-05-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-05-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-05-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-05-24T06:00:00+00:00,GBP,CPI y/y,quoted
+2023-06-01T09:00:00+00:00,EUR,CPI Flash Estimate y/y,quoted
+2023-06-15T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-06-15T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-06-21T06:02:00+00:00,GBP,CPI y/y,quoted
+2023-06-22T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-06-22T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2023-06-22T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-06-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-06-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-06-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-07-13T06:00:00+00:00,GBP,GDP m/m,quoted
+2023-07-19T06:00:00+00:00,GBP,CPI y/y,quoted
+2023-07-24T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-07-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-07-24T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-07-27T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-07-27T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-08-03T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2023-08-03T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-08-03T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2023-08-03T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-08-11T06:00:00+00:00,GBP,GDP m/m,quoted
+2023-08-15T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2023-08-16T06:00:00+00:00,GBP,CPI y/y,quoted
+2023-08-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-08-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-08-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-09-13T06:00:00+00:00,GBP,GDP m/m,quoted
+2023-09-14T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-09-14T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-09-21T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-09-21T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2023-09-21T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-09-22T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2023-09-22T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-09-22T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-09-22T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-09-28T07:00:00+00:00,EUR,Spanish Flash CPI y/y,quoted
+2023-10-12T06:00:00+00:00,GBP,GDP m/m,quoted
+2023-10-17T06:00:00+00:00,GBP,Average Earnings Index 3m/y,quoted
+2023-10-18T06:00:00+00:00,GBP,CPI y/y,quoted
+2023-10-24T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-10-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-10-24T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-10-26T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-10-26T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-11-02T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2023-11-02T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-11-02T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2023-11-02T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-11-10T07:00:00+00:00,GBP,GDP m/m,quoted
+2023-11-14T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2023-11-17T07:00:00+00:00,GBP,Retail Sales m/m,quoted
+2023-11-23T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-11-23T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-11-23T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2023-11-29T08:00:00+00:00,EUR,Spanish Flash CPI y/y,quoted
+2023-12-13T07:00:00+00:00,GBP,GDP m/m,quoted
+2023-12-14T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2023-12-14T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2023-12-14T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2023-12-14T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2023-12-14T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2023-12-15T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2023-12-15T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2023-12-15T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-01-12T07:00:00+00:00,GBP,GDP m/m,quoted
+2024-01-17T07:00:00+00:00,GBP,CPI y/y,quoted
+2024-01-24T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-01-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-01-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-01-25T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-01-25T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-02-01T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2024-02-01T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-02-01T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2024-02-01T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-02-13T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2024-02-14T07:00:00+00:00,GBP,CPI y/y,quoted
+2024-02-15T07:00:00+00:00,GBP,GDP m/m,quoted
+2024-02-22T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-02-22T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-02-22T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-03-07T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-03-07T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-03-21T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-03-21T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-03-21T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-03-21T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2024-03-21T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-04-11T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-04-11T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-04-17T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-04-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-04-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-04-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-05-09T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2024-05-09T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-05-09T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2024-05-09T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-05-10T06:00:00+00:00,GBP,GDP m/m,quoted
+2024-05-22T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-05-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-05-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-05-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-05-31T09:00:00+00:00,EUR,Core CPI Flash Estimate y/y,quoted
+2024-06-06T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-06-06T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-06-11T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2024-06-19T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-06-20T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-06-20T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2024-06-20T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-06-21T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2024-06-21T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-06-21T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-06-21T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-07-02T09:00:00+00:00,EUR,Core CPI Flash Estimate y/y,quoted
+2024-07-17T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-07-18T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-07-18T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-07-24T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-07-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-07-24T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-07-31T09:00:00+00:00,EUR,Core CPI Flash Estimate y/y,quoted
+2024-08-01T11:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2024-08-01T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-08-01T11:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2024-08-01T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-08-13T06:00:00+00:00,GBP,Claimant Count Change,quoted
+2024-08-14T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-08-15T06:00:00+00:00,GBP,GDP m/m,quoted
+2024-08-16T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2024-08-22T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-08-22T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-08-22T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-08-30T09:00:00+00:00,EUR,CPI Flash Estimate y/y,quoted
+2024-09-11T06:00:00+00:00,GBP,GDP m/m,quoted
+2024-09-12T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-09-12T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-09-18T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-09-19T11:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-09-19T11:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2024-09-19T11:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-09-23T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-09-23T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-09-23T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-10-01T09:00:00+00:00,EUR,Core CPI Flash Estimate y/y,quoted
+2024-10-16T06:00:00+00:00,GBP,CPI y/y,quoted
+2024-10-17T12:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-10-17T12:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-10-18T06:00:00+00:00,GBP,Retail Sales m/m,quoted
+2024-10-24T07:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-10-24T07:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-10-24T08:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-11-07T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2024-11-07T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-11-07T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2024-11-07T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2024-11-22T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-11-22T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-11-22T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-12-12T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2024-12-12T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2024-12-16T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2024-12-16T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2024-12-16T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2024-12-17T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2024-12-18T07:00:00+00:00,GBP,CPI y/y,quoted
+2024-12-19T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2024-12-19T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2024-12-19T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2025-01-17T07:00:00+00:00,GBP,Retail Sales m/m,quoted
+2025-01-21T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2025-01-24T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2025-01-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2025-01-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2025-01-30T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2025-01-30T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2025-02-06T12:00:00+00:00,GBP,BOE Monetary Policy Report,quoted
+2025-02-06T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2025-02-06T12:00:00+00:00,GBP,Monetary Policy Summary,imputed
+2025-02-06T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2025-02-18T07:00:00+00:00,GBP,Claimant Count Change,quoted
+2025-02-19T07:00:00+00:00,GBP,CPI y/y,quoted
+2025-02-21T07:00:00+00:00,GBP,Retail Sales m/m,quoted
+2025-02-21T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2025-02-21T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2025-02-21T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2025-03-06T13:15:00+00:00,EUR,Main Refinancing Rate,quoted
+2025-03-06T13:45:00+00:00,EUR,ECB Press Conference,quoted
+2025-03-20T12:00:00+00:00,GBP,MPC Official Bank Rate Votes,imputed
+2025-03-20T12:00:00+00:00,GBP,Monetary Policy Summary,quoted
+2025-03-20T12:00:00+00:00,GBP,Official Bank Rate,imputed
+2025-03-24T08:15:00+00:00,EUR,French Flash Manufacturing PMI,quoted
+2025-03-24T08:30:00+00:00,EUR,German Flash Manufacturing PMI,quoted
+2025-03-24T09:30:00+00:00,GBP,Flash Manufacturing PMI,quoted
+2025-03-26T07:00:00+00:00,GBP,CPI y/y,quoted

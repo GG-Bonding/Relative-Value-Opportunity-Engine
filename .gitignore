@@ -11,6 +11,7 @@ build/
 *.duckdb
 *.duckdb.wal
 data/forward/
+data/m15/
 data/m5z/
 artifacts/runs/
 .DS_Store
