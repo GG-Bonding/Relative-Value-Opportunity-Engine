@@ -5,16 +5,19 @@
 // earlier UTC date, never the broker D1 and never the still-open date.
 // Live orders stay off unless InpAllowLiveTrading is also true.
 //
-// Tester: EURGBP, deposit 1000 USD, leverage 1:1000.
-// Model: Every tick, or 1 minute OHLC. Open prices only skips the stop inside a bar.
+// Tester: EURGBP M15, deposit 1000 or 10000 USD, leverage 1:1000.
+// Model: 1 minute OHLC is enough for this book. Every tick based on real ticks is slower.
+// Manual UTC offset must be on in the tester: TimeTradeServer and TimeGMT are equal there,
+// so auto offset is always 0. IC Markets-style FX servers are usually UTC+2 / UTC+3.
 // On a 5-digit symbol set Spread to 3 points (0.3 pip) to sit next to the 0.25 pip model.
+// InpMaxSpreadPips skips an entry when the live bid/ask is wider than that.
 // InpCommissionPerLot only sizes the lot. The tester charges whatever the symbol specifies.
 // Swap is the symbol's swap. The researched account did not charge swap.
-// Blackout: 235 merged windows, 2019-12-12 12:30 UTC through 2025-03-26 08:00 UTC.
-// Releases after 2025-03-26 are not in the file, so later entries are not blocked.
+// Built-in blackout: 235 merged windows, 2019-12-12 12:30 UTC through 2025-03-26 08:00 UTC.
+// Put later UK/EZ high-impact release times (UTC unix seconds) in InpExtraEventsFile.
 
 #property copyright "RelativeValueEngine"
-#property version   "1.00"
+#property version   "1.01"
 #property description "EURGBP M15 return-z mirror. Closed bar in, broker stop out."
 
 #include <Trade/Trade.mqh>
@@ -33,18 +36,22 @@ input int    InpPriceWindow            = 60;    // 价值z天数
 input int    InpSessionStartHour       = 7;     // 开仓开始（UTC，含）
 input int    InpSessionEndHour         = 17;    // 开仓结束（UTC，不含）
 input bool   InpUseBlacklist           = true;  // 新闻前后禁止开仓
+input string InpExtraEventsFile        = "EURGBP_M15MeanRev_events.txt"; // 额外公布时间（UTC秒，终端Files）
+input int    InpEventBeforeMinutes     = 15;    // 公布前禁开仓（分钟）
+input int    InpEventAfterMinutes      = 60;    // 公布后禁开仓（分钟）
 
 input group "出场和手数"
 input double InpTakeProfitPercent      = 0.38;  // 止盈（价格%）
 input double InpStopLossPercent        = 0.46;  // 止损（价格%）
-input int    InpMaxHoldMinutes         = 13137; // 最长持仓（分钟）
+input int    InpMaxHoldMinutes         = 13137; // 最长持仓（分钟）。真实隔夜息重时可用 1440–2880
 input double InpRiskPercent            = 5.0;   // 止损占余额（%）
 input double InpCommissionPerLot       = 7.0;   // 每手往返手续费（账户货币，只用于算手数）
+input double InpMaxSpreadPips          = 0.8;   // 最大允许点差（点）。0 为关闭
 input int    InpMaxStopsPerDay         = 2;     // 同一UTC日几笔止损后停止开仓，0为关闭
 
 input group "时钟"
-input bool   InpManualOffset           = false; // 手动指定服务器减UTC
-input int    InpServerUtcOffsetHours   = 0;     // 服务器减UTC的小时
+input bool   InpManualOffset           = true;  // 手动指定服务器减UTC（测试器必须打开）
+input int    InpServerUtcOffsetHours   = 2;     // 服务器减UTC的小时（夏令时常见为3）
 
 #define BLACKOUT_N 235
 
@@ -141,12 +148,24 @@ datetime LastM15Open = 0;
 datetime LastRetryMinute = 0;
 bool WaitingForHistory = false;
 int LastOffsetSeen = 2147483647;
+datetime ExtraBlackoutStart[];
+datetime ExtraBlackoutEnd[];
+int ExtraBlackoutN = 0;
 
 int OffsetSeconds()
   {
    if(InpManualOffset)
       return InpServerUtcOffsetHours * 3600;
+   // In the Strategy Tester TimeTradeServer() equals TimeGMT(), so auto offset is always 0.
+   if(MQLInfoInteger(MQL_TESTER) != 0)
+      return InpServerUtcOffsetHours * 3600;
    return (int)(TimeTradeServer() - TimeGMT());
+  }
+
+datetime NowUtc()
+  {
+   // Tester equates TimeGMT to the simulated server clock. Subtract the broker offset.
+   return TimeTradeServer() - OffsetSeconds();
   }
 
 int Ymd(const datetime stamp)
@@ -223,22 +242,133 @@ bool OurPosition(ulong &ticket)
    return false;
   }
 
-bool InBlackout(const datetime close_utc)
+bool WindowHit(const datetime &starts[], const datetime &ends[], const int count, const datetime close_utc)
   {
-   if(!InpUseBlacklist || BLACKOUT_N == 0)
+   if(count <= 0)
       return false;
    int low = 0;
-   int high = BLACKOUT_N;
+   int high = count;
    while(low < high)
      {
       int mid = (low + high) / 2;
-      if(BlackoutStart[mid] <= close_utc)
+      if(starts[mid] <= close_utc)
          low = mid + 1;
       else
          high = mid;
      }
    int pos = low - 1;
-   return pos >= 0 && close_utc < BlackoutEnd[pos];
+   return pos >= 0 && close_utc < ends[pos];
+  }
+
+bool InBlackout(const datetime close_utc)
+  {
+   if(!InpUseBlacklist)
+      return false;
+   if(WindowHit(BlackoutStart, BlackoutEnd, BLACKOUT_N, close_utc))
+      return true;
+   return WindowHit(ExtraBlackoutStart, ExtraBlackoutEnd, ExtraBlackoutN, close_utc);
+  }
+
+void SortExtraWindows()
+  {
+   for(int i = 0; i < ExtraBlackoutN; i++)
+     {
+      for(int j = i + 1; j < ExtraBlackoutN; j++)
+        {
+         if(ExtraBlackoutStart[j] < ExtraBlackoutStart[i])
+           {
+            datetime start_swap = ExtraBlackoutStart[i];
+            datetime end_swap = ExtraBlackoutEnd[i];
+            ExtraBlackoutStart[i] = ExtraBlackoutStart[j];
+            ExtraBlackoutEnd[i] = ExtraBlackoutEnd[j];
+            ExtraBlackoutStart[j] = start_swap;
+            ExtraBlackoutEnd[j] = end_swap;
+           }
+        }
+     }
+  }
+
+void MergeExtraWindows()
+  {
+   if(ExtraBlackoutN <= 1)
+      return;
+   int write = 0;
+   for(int read = 1; read < ExtraBlackoutN; read++)
+     {
+      if(ExtraBlackoutStart[read] <= ExtraBlackoutEnd[write])
+        {
+         if(ExtraBlackoutEnd[read] > ExtraBlackoutEnd[write])
+            ExtraBlackoutEnd[write] = ExtraBlackoutEnd[read];
+         continue;
+        }
+      write++;
+      ExtraBlackoutStart[write] = ExtraBlackoutStart[read];
+      ExtraBlackoutEnd[write] = ExtraBlackoutEnd[read];
+     }
+   ExtraBlackoutN = write + 1;
+   ArrayResize(ExtraBlackoutStart, ExtraBlackoutN);
+   ArrayResize(ExtraBlackoutEnd, ExtraBlackoutN);
+  }
+
+int LoadExtraEvents()
+  {
+   ExtraBlackoutN = 0;
+   ArrayResize(ExtraBlackoutStart, 0);
+   ArrayResize(ExtraBlackoutEnd, 0);
+   if(!InpUseBlacklist || StringLen(InpExtraEventsFile) == 0)
+      return 0;
+   int handle = FileOpen(InpExtraEventsFile, FILE_READ | FILE_TXT | FILE_ANSI | FILE_COMMON);
+   if(handle == INVALID_HANDLE)
+      handle = FileOpen(InpExtraEventsFile, FILE_READ | FILE_TXT | FILE_ANSI);
+   if(handle == INVALID_HANDLE)
+      return 0;
+   int before = MathMax(InpEventBeforeMinutes, 0) * 60;
+   int after = MathMax(InpEventAfterMinutes, 0) * 60;
+   while(!FileIsEnding(handle))
+     {
+      string line = FileReadString(handle);
+      StringReplace(line, "\r", "");
+      StringTrimLeft(line);
+      StringTrimRight(line);
+      if(StringLen(line) == 0 || StringGetCharacter(line, 0) == '#')
+         continue;
+      int comma = StringFind(line, ",");
+      string field = (comma < 0 ? line : StringSubstr(line, 0, comma));
+      StringTrimLeft(field);
+      StringTrimRight(field);
+      if(StringLen(field) == 0)
+         continue;
+      ushort first = StringGetCharacter(field, 0);
+      if(first < '0' || first > '9')
+         continue;
+      datetime stamp = (datetime)StringToInteger(field);
+      if(stamp <= 0)
+         continue;
+      int size = ExtraBlackoutN;
+      ArrayResize(ExtraBlackoutStart, size + 1);
+      ArrayResize(ExtraBlackoutEnd, size + 1);
+      ExtraBlackoutStart[size] = stamp - before;
+      ExtraBlackoutEnd[size] = stamp + after;
+      ExtraBlackoutN = size + 1;
+     }
+   FileClose(handle);
+   SortExtraWindows();
+   MergeExtraWindows();
+   return ExtraBlackoutN;
+  }
+
+bool SpreadAllowed(const double bid, const double ask)
+  {
+   if(InpMaxSpreadPips <= 0.0)
+      return true;
+   double pip = 0.0001;
+   if(SymbolInfoInteger(_Symbol, SYMBOL_DIGITS) == 3 || SymbolInfoInteger(_Symbol, SYMBOL_DIGITS) == 5)
+      pip = SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 10.0;
+   else
+      pip = SymbolInfoDouble(_Symbol, SYMBOL_POINT);
+   if(pip <= 0.0)
+      pip = 0.0001;
+   return ((ask - bid) / pip) <= InpMaxSpreadPips + 1e-9;
   }
 
 int EntryYmd(const ulong position_id)
@@ -390,8 +520,10 @@ void RememberOffset()
    if(offset == LastOffsetSeen)
       return;
    LastOffsetSeen = offset;
-   Print("服务器时间减UTC = ", offset, " 秒。K线收盘按这个差值换到UTC。");
-   if(!InpManualOffset && offset == 0)
+   Print("服务器时间减UTC = ", offset, " 秒。K线收盘和持仓时钟都按这个差值换到UTC。");
+   if(MQLInfoInteger(MQL_TESTER) != 0 && !InpManualOffset)
+      Print("测试器里自动偏移恒为0。已改用 InpServerUtcOffsetHours=", InpServerUtcOffsetHours, "。");
+   if(!InpManualOffset && offset == 0 && MQLInfoInteger(MQL_TESTER) == 0)
       Print("自动偏移是0。如果服务器不是UTC，时段会错，请改用手动偏移。");
   }
 
@@ -410,12 +542,13 @@ void ManageTimeExit()
       datetime opened = (datetime)PositionGetInteger(POSITION_TIME);
       deadline = opened - OffsetSeconds() + InpMaxHoldMinutes * 60;
      }
-   if(TimeGMT() < deadline)
+   datetime now_utc = NowUtc();
+   if(now_utc < deadline)
       return;
    if(!Trade.PositionClose(ticket))
       Print("时间出场失败 ", Trade.ResultRetcode(), " ", Trade.ResultRetcodeDescription());
    else
-      Print("时间出场 ", TimeToString(TimeGMT(), TIME_DATE | TIME_MINUTES), " UTC");
+      Print("时间出场 ", TimeToString(now_utc, TIME_DATE | TIME_MINUTES), " UTC");
   }
 
 bool Evaluate()
@@ -521,6 +654,13 @@ bool Evaluate()
       Print("没有买卖价，跳过 ", TimeToString(close_utc, TIME_DATE | TIME_MINUTES));
       return true;
      }
+   if(!SpreadAllowed(bid, ask))
+     {
+      Print("点差过宽，跳过 ", TimeToString(close_utc, TIME_DATE | TIME_MINUTES),
+            " UTC bid=", DoubleToString(bid, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS)),
+            " ask=", DoubleToString(ask, (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS)));
+      return true;
+     }
    double spread = ask - bid;
    double entry = rates[1].close;
    double stop_ratio = InpStopLossPercent / 100.0;
@@ -617,19 +757,23 @@ int OnInit()
    Trade.SetDeviationInPoints(InpDeviationPoints);
    Trade.SetTypeFilling(Filling());
    Trade.SetAsyncMode(false);
+   int extra = LoadExtraEvents();
    string currency = AccountInfoString(ACCOUNT_CURRENCY);
    Print("EURGBP M15 收益z>", InpZMin,
          " 价值z>", InpPriceZMin,
          " 止盈", InpTakeProfitPercent, "% 止损", InpStopLossPercent, "%",
          " 持仓", InpMaxHoldMinutes, "分钟 风险", InpRiskPercent, "%");
+   Print("服务器减UTC ", OffsetSeconds(), " 秒",
+         "（手动=", InpManualOffset, "，小时输入=", InpServerUtcOffsetHours, "）。",
+         "最大点差 ", InpMaxSpreadPips, " 点。");
    Print("点差点数 ", (int)SymbolInfoInteger(_Symbol, SYMBOL_SPREAD),
-         "。5位报价要贴近0.25点，测试器点差填3。建模用每个即时价格或1分钟OHLC。");
+         "。5位报价要贴近0.25点，测试器点差填3。真实场景建模用1分钟OHLC即可。");
    Print("手续费输入 ", InpCommissionPerLot, " ", currency,
-         " 只用于算手数。账户里实际扣的手续费以品种设置为准。");
-   Print("新闻禁开仓 ", BLACKOUT_N, " 段，",
+         " 只用于算手数。账户里实际扣的手续费和隔夜息以品种设置为准。");
+   Print("内置新闻禁开仓 ", BLACKOUT_N, " 段，",
          TimeToString(BlackoutStart[0], TIME_DATE | TIME_MINUTES), " 到 ",
          TimeToString(BlackoutEnd[BLACKOUT_N - 1], TIME_DATE | TIME_MINUTES),
-         " UTC。2025-03-26之后没有新闻数据。");
+         " UTC。额外文件 ", InpExtraEventsFile, " 载入 ", extra, " 段。");
    if(currency != "USD")
       Print("账户货币是 ", currency, "。7是按美元账户准备的，这里要改成该货币的每手往返手续费。");
    return INIT_SUCCEEDED;

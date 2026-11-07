@@ -1,0 +1,8 @@
+# Extra UK / euro-area high-impact release times for EURGBP_M15MeanRev.
+# One UTC unix timestamp per line. Optional comma and note after the stamp.
+# The EA opens a blackout [release - InpEventBeforeMinutes, release + InpEventAfterMinutes).
+# Built-in table already covers 2019-12-12 through 2025-03-26.
+# Put this file in the terminal's MQL5/Files folder (or Common\Files).
+#
+# Example (do not invent stamps; paste real release times):
+# 1742976000, UK CPI example
